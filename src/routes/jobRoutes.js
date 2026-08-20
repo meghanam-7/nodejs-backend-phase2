@@ -3,17 +3,56 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    authenticateToken,
+  authenticateToken,
 } = require("../middleware/authMiddleware");
 
 const {
-    createEmailJob,
-} = require("../controllers/jobController");
+  requireRole,
+} = require("../middleware/authorizationMiddleware");
+
+const validateRequest = require("../middleware/validationMiddleware");
+
+const {
+  createJobValidation,
+  jobIdValidation,
+  evaluateJobValidation,
+} = require("../validations/jobValidation");
+
+const jobController = require("../controllers/jobController");
 
 router.post(
-    "/api/jobs/email",
-    authenticateToken,
-    createEmailJob
+  "/jobs",
+  authenticateToken,
+  requireRole("COMPANY"),
+  createJobValidation,
+  validateRequest,
+  jobController.createJob
+);
+
+router.get(
+  "/jobs",
+  authenticateToken,
+  requireRole("COMPANY"),
+  jobController.getJobs
+);
+
+router.get(
+  "/jobs/:id",
+  authenticateToken,
+  requireRole("COMPANY"),
+  jobIdValidation,
+  validateRequest,
+  jobController.getJob
+);
+
+router.post(
+  "/jobs/:id/evaluate",
+  authenticateToken,
+  requireRole("COMPANY"),
+  jobIdValidation,
+  evaluateJobValidation,
+  validateRequest,
+  jobController.evaluateJob
 );
 
 module.exports = router;

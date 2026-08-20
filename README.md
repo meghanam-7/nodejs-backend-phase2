@@ -25,6 +25,28 @@ The implementation includes:
 - Integration testing
 - API documentation
 
+### Phase 2 · Day 2
+
+**Task 2 – Job Posting with Skill Thresholds**
+
+The objective of Day 2 was to allow companies to publish jobs with minimum skill-level requirements and evaluate candidates against those requirements.
+
+The implementation includes:
+
+- Job posting and publishing
+- Competency/skill data modelling
+- Job skill threshold modelling
+- Skill threshold validation
+- Threshold rules engine
+- Candidate eligibility evaluation
+- Per-job assessment token generation
+- Company-only job access using JWT authentication
+- Role-based authorization
+- PostgreSQL persistence using Prisma
+- Competency seed data
+- API validation
+- Postman API testing
+
 ---
 
 # 🛠️ Tech Stack
@@ -49,6 +71,8 @@ The implementation includes:
 - Express Validator
 - Role-based authorization
 - Rate limiting
+- Helmet
+- CORS
 
 ### Testing
 
@@ -76,7 +100,9 @@ p2task-node-server/
 │
 ├── prisma/
 │   ├── migrations/
-│   │   └── 20260820124500_task1_company_marketplace/
+│   │   ├── 20260820124500_task1_company_marketplace/
+│   │   │   └── migration.sql
+│   │   └── task2_job_skill_thresholds/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -89,7 +115,8 @@ p2task-node-server/
 │   │
 │   ├── controllers/
 │   │   ├── authController.js
-│   │   └── companyController.js
+│   │   ├── companyController.js
+│   │   └── jobController.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
@@ -102,19 +129,25 @@ p2task-node-server/
 │   │
 │   ├── persistence/
 │   │   ├── userRepository.js
-│   │   └── companyRepository.js
+│   │   ├── companyRepository.js
+│   │   └── jobRepository.js
 │   │
 │   ├── routes/
 │   │   ├── authRoutes.js
-│   │   └── companyRoutes.js
+│   │   ├── companyRoutes.js
+│   │   └── jobRoutes.js
 │   │
 │   ├── services/
 │   │   ├── authService.js
-│   │   └── companyService.js
+│   │   ├── companyService.js
+│   │   ├── jobService.js
+│   │   ├── assessmentService.js
+│   │   └── thresholdRulesEngine.js
 │   │
 │   ├── validations/
 │   │   ├── authValidation.js
-│   │   └── companyValidation.js
+│   │   ├── companyValidation.js
+│   │   └── jobValidation.js
 │   │
 │   ├── app.js
 │   └── server.js
@@ -136,7 +169,10 @@ p2task-node-server/
 ├── jest.config.js
 ├── .gitignore
 └── README.md
+
 ```
+
+---
 
 ---
 
@@ -148,243 +184,10 @@ p2task-node-server/
 | `POST` | `/auth/login` | Public | Authenticates a user and returns a JWT |
 | `POST` | `/companies/signup` | Public | Registers a company and creates its user, profile, and initial KYC record |
 | `GET` | `/companies/me` | JWT + COMPANY role | Returns the authenticated company's details, profile, and KYC information |
-
----
-
-# 📈 Project Progress
-
-## Day 1 – Company Onboarding & Marketplace Data Model
-
-### 1. Marketplace Data Model
-
-The first step was to extend the Phase 1 database model with the initial marketplace entities required for company onboarding.
-
-Three new entities were introduced:
-
-- `Company`
-- `CompanyProfile`
-- `CompanyKyc`
-
-The `Company` entity is connected to the existing `User` model.
-
-```text
-User
- │
- ▼
-Company
- ├── CompanyProfile
- └── CompanyKyc
-```
-
----
-
-### 2. Company Onboarding
-
-Implemented the company onboarding API:
-
-```http
-POST /companies/signup
-```
-
-The endpoint validates the incoming request and creates the required records.
-
-A successful onboarding creates:
-
-```text
-User
-   ↓
-Company
-   ↓
-CompanyProfile
-   ↓
-CompanyKyc
-```
-
-The company user is assigned:
-
-```text
-role = COMPANY
-```
-
-The newly created company initially receives:
-
-```text
-status = ONBOARDING
-```
-
----
-
-### 3. Company Profile
-
-A company profile is automatically created during signup.
-
-The profile currently supports fields such as:
-
-- Website
-- Description
-- Industry
-- Company size
-- Phone
-- Address
-
-The profile is associated with the newly created company.
-
----
-
-### 4. KYC Initialization
-
-A KYC record is automatically created when the company is onboarded.
-
-The initial KYC status is:
-
-```text
-NOT_STARTED
-```
-
-This establishes the foundation for the future KYC workflow without implementing the complete KYC verification process in Task 1.
-
----
-
-### 5. Database Migration
-
-A new Prisma migration was created:
-
-```text
-20260820124500_task1_company_marketplace
-```
-
-The migration was successfully applied to the existing PostgreSQL database.
-
-The Prisma schema was also validated and introspected successfully.
-
----
-
-### 6. Authentication Integration
-
-The existing Phase 1 authentication system was reused.
-
-After creating the company account, the company user can authenticate through:
-
-```http
-POST /auth/login
-```
-
-A JWT is returned after successful authentication.
-
-The JWT is then used to access protected company APIs.
-
----
-
-### 7. Authenticated Company Access
-
-Implemented:
-
-```http
-GET /companies/me
-```
-
-The endpoint verifies the JWT and retrieves the authenticated company.
-
-The response includes:
-
-```text
-Company
- ├── Company Profile
- └── Company KYC
-```
-
-This also verifies that the company data returned by the API is actually persisted in PostgreSQL.
-
----
-
-### 8. Validation & Failure Handling
-
-The implementation was tested against both successful and failure scenarios.
-
-#### Successful Signup
-
-```text
-POST /companies/signup
-→ Success
-```
-
-#### Duplicate Signup
-
-```text
-POST /companies/signup
-→ 409 Conflict
-```
-
-#### Invalid Signup Data
-
-```text
-POST /companies/signup
-→ 400 Bad Request
-```
-
-#### Unauthenticated Company Access
-
-```text
-GET /companies/me
-→ 401 Unauthorized
-```
-
-#### Authenticated Company Access
-
-```text
-GET /companies/me
-→ 200 OK
-```
-
----
-
-### 9. Database Persistence Verification
-
-The newly created company data was verified using Prisma Studio.
-
-The following records were confirmed in PostgreSQL:
-
-```text
-User
-Company
-CompanyProfile
-CompanyKyc
-```
-
-The same data was subsequently retrieved through:
-
-```http
-GET /companies/me
-```
-
-This verified the complete:
-
-```text
-API → PostgreSQL → API
-```
-
-flow.
-
----
-
-### 10. Testing
-
-Task 1 was verified through Postman and the existing integration-test infrastructure.
-
-The following scenarios were successfully tested:
-
-- Health check
-- Company signup
-- Database persistence
-- Company login
-- JWT authentication
-- Authenticated company retrieval
-- Duplicate signup
-- Invalid signup
-- Unauthorized access
-- Authorized access
-
-All tested scenarios passed successfully.
+| `POST` | `/jobs` | JWT + COMPANY role | Creates and publishes a job with skill thresholds |
+| `GET` | `/jobs` | JWT + COMPANY role | Returns jobs belonging to the authenticated company |
+| `GET` | `/jobs/:id` | JWT + COMPANY role | Returns a specific company job with its thresholds and assessment information |
+| `POST` | `/jobs/:id/evaluate` | JWT + COMPANY role | Evaluates candidate skills against the job's skill thresholds |
 
 ---
 
@@ -415,6 +218,54 @@ All tested scenarios passed successfully.
 
 ---
 
+## Phase 2 · Day 2
+
+### Task 2 – Job Posting with Skill Thresholds
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- [x] Job data model implemented
+- [x] Competency data model implemented
+- [x] Job skill threshold model implemented
+- [x] Prisma migration created and applied
+- [x] Competency seed data added
+- [x] Job creation implemented
+- [x] Job publishing implemented
+- [x] Skill threshold validation implemented
+- [x] Threshold rules engine implemented
+- [x] Candidate eligibility evaluation implemented
+- [x] Per-job assessment token generation implemented
+- [x] Company-only job access implemented
+- [x] JWT authentication verified
+- [x] Role-based authorization verified
+- [x] Job retrieval APIs implemented
+- [x] Postman API testing completed
+- [x] Passing candidate evaluation verified
+- [x] Failing candidate evaluation verified
+
+### Task 2 Flow
+
+```text
+Company
+   ↓
+Create Job
+   ↓
+Add Skill Thresholds
+   ↓
+Validate Thresholds
+   ↓
+Publish Job
+   ↓
+Generate Assessment Token
+   ↓
+Evaluate Candidate Skills
+   ↓
+Determine Eligibility
+```
+---
+
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
 The upcoming Phase 2 tasks will progressively extend the marketplace backend.
@@ -428,6 +279,7 @@ Future areas will include:
 - Search and filtering
 - Matching and recommendation logic
 - Transactions and business workflows
+- Candidate and assessment workflows
 - Additional security and authorization
 - Performance and scalability improvements
 - Production-oriented backend architecture
@@ -445,139 +297,30 @@ git clone <repository-url>
 cd p2task-node-server
 ```
 
----
-
-## 2. Install Dependencies
-
+## 2. Install
 ```bash
 npm install
 ```
 
----
-
-## 3. Configure Environment Variables
-
-Create a `.env` file in the project root.
-
-Example:
-
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/placemux_backend"
-```
-
-Add the remaining environment variables required by the application configuration.
-
-> `.env` is excluded from Git using `.gitignore`.
-
----
-
-## 4. Generate Prisma Client
-
+## 3. Prisma
 ```bash
 npx prisma generate
-```
-
----
-
-## 5. Apply Database Migrations
-
-```bash
 npx prisma migrate deploy
+npx prisma db seed
 ```
 
----
-
-## 6. Validate Prisma Schema
-
-```bash
-npx prisma validate
-```
-
----
-
-## 7. Start the Server
-
+## 4. Start the Server
 ```bash
 npm start
 ```
 
-For development:
-
-```bash
-npm run dev
-```
-
 ---
 
-## 8. Run Tests
+# 👩‍💻 Author
 
-```bash
-npm test
-```
+**Meghana M.**
 
----
+Computer Science Graduate | Backend Developer (Node.js) | Aspiring Software Engineer
 
-## 9. Open Prisma Studio
+GitHub: https://github.com/meghanam-7
 
-```bash
-npx prisma studio
-```
-
-Prisma Studio will be available at:
-
-```text
-http://localhost:5555
-```
-
----
-
-# 🎓 Learning Goals
-
-Through Phase 2 · Day 1, the main learning objectives were:
-
-- Designing marketplace-oriented database entities
-- Extending an existing Prisma schema safely
-- Creating and applying database migrations
-- Understanding entity relationships
-- Implementing transactional company onboarding
-- Creating related database records during registration
-- Reusing an existing authentication system
-- Implementing JWT-protected APIs
-- Applying role-based authorization
-- Validating API input
-- Handling duplicate and invalid requests
-- Verifying real database persistence
-- Testing backend APIs using Postman
-- Structuring backend code using controllers, services, repositories, routes, and validations
-
----
-
-# 👨‍💻 Author
-
-**Meghana**
-
-Computer Science Graduate | Backend Developer
-
-### Technical Focus
-
-- Node.js
-- Express.js
-- PostgreSQL
-- Prisma
-- REST APIs
-- JWT Authentication
-- Backend Development
-
-### GitHub
-
-[GitHub Profile](<your-github-profile-link>)
-
----
-
-# 🚀 Phase 2 · Day 1 Completed
-
-**Task 1 – Company Onboarding & Marketplace Data Model**
-
-**Status: ✅ Completed**
-
-Moving forward to **Phase 2 · Task 2**.

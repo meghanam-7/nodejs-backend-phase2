@@ -54,6 +54,7 @@ model Company {
   owner       User            @relation("CompanyOwner", fields: [ownerUserId], references: [id])
   kyc         CompanyKyc?
   profile     CompanyProfile?
+  jobs        Job[]
 }
 
 model CompanyProfile {
@@ -80,4 +81,65 @@ model CompanyKyc {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id             Int       @id @default(autoincrement())
+  companyId      Int
+  title          String
+  description    String
+  location       String?
+  employmentType String?
+  status         String    @default("DRAFT")
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  company     Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  thresholds  JobSkillThreshold[]
+  assessments JobAssessment[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model Competency {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  thresholds JobSkillThreshold[]
+}
+
+model JobSkillThreshold {
+  id           Int      @id @default(autoincrement())
+  jobId        Int
+  competencyId Int
+  minimumLevel Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  job        Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  competency Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, competencyId])
+  @@index([jobId])
+  @@index([competencyId])
+}
+
+model JobAssessment {
+  id        Int       @id @default(autoincrement())
+  jobId     Int
+  token     String    @unique
+  status    String    @default("ACTIVE")
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId])
+  @@index([jobId])
 }

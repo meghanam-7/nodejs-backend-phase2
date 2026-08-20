@@ -1,30 +1,89 @@
-const emailQueue = require("../queues/emailQueue");
+const jobService = require("../services/jobService");
 
-const createEmailJob = async (req, res) => {
-    try {
-        const { email, subject, message } = req.body;
+const createJob = async (req, res) => {
+  try {
+    const job = await jobService.createJob(
+      req.user.id,
+      req.body
+    );
 
-        const job = await emailQueue.add("sendEmail", {
-            email,
-            subject,
-            message,
-        });
+    return res.status(201).json({
+      success: true,
+      message: "Job published successfully",
+      data: job,
+    });
+  } catch (error) {
+    console.error("Create job error:", error);
 
-        res.status(202).json({
-            success: true,
-            message: "Email job added to queue successfully",
-            jobId: job.id,
-        });
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Failed to add email job",
-            error: error.message,
-        });
-    }
+const getJobs = async (req, res) => {
+  try {
+    const jobs = await jobService.getCompanyJobs(
+      req.user.id
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: jobs,
+    });
+  } catch (error) {
+    console.error("Get jobs error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getJob = async (req, res) => {
+  try {
+    const job = await jobService.getCompanyJob(
+      req.user.id,
+      Number(req.params.id)
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: job,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const evaluateJob = async (req, res) => {
+  try {
+    const result = await jobService.evaluateJob(
+      req.user.id,
+      Number(req.params.id),
+      req.body.skills
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
-    createEmailJob,
+  createJob,
+  getJobs,
+  getJob,
+  evaluateJob,
 };
