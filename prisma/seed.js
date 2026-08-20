@@ -8,6 +8,9 @@ async function main() {
     console.log("🌱 Seeding database...");
 
     // Clear existing data
+    await prisma.companyKyc.deleteMany();
+    await prisma.companyProfile.deleteMany();
+    await prisma.company.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
     await prisma.user.deleteMany();
@@ -73,6 +76,42 @@ async function main() {
     });
 
     console.log("✅ Products Seeded");
+
+    const companyOwner = await prisma.user.findUnique({
+        where: { email: "meghana@gmail.com" },
+    });
+
+    const company = await prisma.company.create({
+        data: {
+            name: "PlaceMux Demo Technologies",
+            legalName: "PlaceMux Demo Technologies Private Limited",
+            slug: "placemux-demo-technologies",
+            status: "ONBOARDING",
+            ownerUserId: companyOwner.id,
+            profile: {
+                create: {
+                    website: "https://example.com",
+                    description: "Seed company for Task 1 onboarding demos.",
+                    industry: "Technology",
+                    companySize: "11-50",
+                    phone: "+919999999999",
+                    address: "Bengaluru, Karnataka",
+                },
+            },
+            kyc: {
+                create: {
+                    status: "NOT_STARTED",
+                },
+            },
+        },
+        include: {
+            profile: true,
+            kyc: true,
+        },
+    });
+
+    console.log("✅ Company, profile, and KYC seeded");
+
 
     // Fetch created users and products
     const allUsers = await prisma.user.findMany();

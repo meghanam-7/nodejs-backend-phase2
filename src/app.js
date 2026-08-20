@@ -53,11 +53,13 @@ const workerRoutes = require("./routes/workerRoutes");
 const authRoutes = require("./routes/authRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const cacheMetricsRoutes = require("./routes/cacheMetricsRoutes");
+const companyRoutes = require("./routes/companyRoutes");
 
 // Public routes
 app.use("/", healthRoutes);
 app.use("/", sampleRoutes);
 app.use("/", authRoutes);
+app.use("/", companyRoutes);
 
 app.use(
     "/api-docs",

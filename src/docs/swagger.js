@@ -43,6 +43,10 @@ const swaggerDefinition = {
             description: "Cache monitoring endpoints",
         },
         {
+            name: "Companies",
+            description: "Company onboarding and profile endpoints",
+        },
+        {
             name: "Jobs",
             description: "Background job endpoints",
         },
@@ -211,6 +215,30 @@ const swaggerDefinition = {
                 },
             },
 
+            CompanySignupRequest: {
+                type: "object",
+                required: [
+                    "contactName",
+                    "email",
+                    "password",
+                    "name",
+                    "legalName"
+                ],
+                properties: {
+                    contactName: { type: "string", minLength: 3, example: "Company Admin" },
+                    email: { type: "string", format: "email", example: "admin@acme.example" },
+                    password: { type: "string", minLength: 6, format: "password", example: "password123" },
+                    name: { type: "string", example: "Acme Technologies" },
+                    legalName: { type: "string", example: "Acme Technologies Private Limited" },
+                    website: { type: "string", format: "uri", example: "https://acme.example" },
+                    description: { type: "string", example: "Technology company" },
+                    industry: { type: "string", example: "Technology" },
+                    companySize: { type: "string", example: "11-50" },
+                    phone: { type: "string", example: "+919999999999" },
+                    address: { type: "string", example: "Bengaluru, Karnataka" }
+                }
+            },
+
             ErrorResponse: {
                 type: "object",
                 properties: {
@@ -255,6 +283,56 @@ const swaggerDefinition = {
                     },
                 },
             },
+        },
+
+        "/companies/signup": {
+            post: {
+                tags: ["Companies"],
+                summary: "Create a company account, profile, and initial KYC record",
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: {
+                                $ref: "#/components/schemas/CompanySignupRequest"
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: "Company onboarded successfully"
+                    },
+                    400: {
+                        description: "Validation failed"
+                    },
+                    409: {
+                        description: "Company account or name already exists"
+                    }
+                }
+            }
+        },
+
+        "/companies/me": {
+            get: {
+                tags: ["Companies"],
+                summary: "Get the authenticated company's profile and KYC status",
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Company profile retrieved"
+                    },
+                    401: {
+                        description: "Authentication required"
+                    },
+                    403: {
+                        description: "Company role required"
+                    },
+                    404: {
+                        description: "Company profile not found"
+                    }
+                }
+            }
         },
 
         "/auth/signup": {
