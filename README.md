@@ -47,6 +47,26 @@ The implementation includes:
 - API validation
 - Postman API testing
 
+### Phase 2 · Day 3
+
+**Task 3 – Search & Discovery**
+
+The objective of Day 3 was to expose search and discovery APIs that allow users to find published jobs using keywords and filters and receive ranked results.
+
+The implementation includes:
+
+- Job search API
+- Keyword-based job search
+- Location filtering
+- Employment type filtering
+- Competency-based search
+- Search and filter combinations
+- Relevance-based job ranking
+- Published-job discovery
+- Query parameter validation
+- Dedicated discovery controller, service, repository, and routes
+- Postman API testing
+
 ---
 
 # 🛠️ Tech Stack
@@ -73,6 +93,15 @@ The implementation includes:
 - Rate limiting
 - Helmet
 - CORS
+
+### Search & Discovery
+
+- Prisma-based job search
+- Keyword search
+- Location filtering
+- Employment type filtering
+- Competency-based search
+- Relevance-based ranking
 
 ### Testing
 
@@ -116,7 +145,8 @@ p2task-node-server/
 │   ├── controllers/
 │   │   ├── authController.js
 │   │   ├── companyController.js
-│   │   └── jobController.js
+│   │   ├── jobController.js
+│   │   └── discoveryController.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
@@ -130,24 +160,28 @@ p2task-node-server/
 │   ├── persistence/
 │   │   ├── userRepository.js
 │   │   ├── companyRepository.js
-│   │   └── jobRepository.js
+│   │   ├── jobRepository.js
+│   │   └── discoveryRepository.js
 │   │
 │   ├── routes/
 │   │   ├── authRoutes.js
 │   │   ├── companyRoutes.js
-│   │   └── jobRoutes.js
+│   │   ├── jobRoutes.js
+│   │   └── discoveryRoutes.js
 │   │
 │   ├── services/
 │   │   ├── authService.js
 │   │   ├── companyService.js
 │   │   ├── jobService.js
 │   │   ├── assessmentService.js
-│   │   └── thresholdRulesEngine.js
+│   │   ├── thresholdRulesEngine.js
+│   │   └── discoveryService.js
 │   │
 │   ├── validations/
 │   │   ├── authValidation.js
 │   │   ├── companyValidation.js
-│   │   └── jobValidation.js
+│   │   ├── jobValidation.js
+│   │   └── discoveryValidation.js
 │   │
 │   ├── app.js
 │   └── server.js
@@ -169,10 +203,7 @@ p2task-node-server/
 ├── jest.config.js
 ├── .gitignore
 └── README.md
-
 ```
-
----
 
 ---
 
@@ -188,6 +219,8 @@ p2task-node-server/
 | `GET` | `/jobs` | JWT + COMPANY role | Returns jobs belonging to the authenticated company |
 | `GET` | `/jobs/:id` | JWT + COMPANY role | Returns a specific company job with its thresholds and assessment information |
 | `POST` | `/jobs/:id/evaluate` | JWT + COMPANY role | Evaluates candidate skills against the job's skill thresholds |
+| `GET` | `/jobs/search` | Public | Searches and filters published jobs with ranked results |
+| `GET` | `/jobs/discover` | Public | Discovers published jobs using search, filtering, and ranking criteria |
 
 ---
 
@@ -265,6 +298,28 @@ Evaluate Candidate Skills
 Determine Eligibility
 ```
 ---
+
+## Phase 2 · Day 3
+### Task 3 – Search & Discovery
+
+**Status: ✅ COMPLETED**
+
+### Completed
+ - Search service implemented
+ - Job search functionality implemented
+ - Job filtering implemented
+ - Job discovery endpoint implemented
+ - Published-job filtering implemented
+ - Search and filter parameters validated
+ - Job ranking implemented
+ - Ranked search results verified
+ - Discovery results verified
+ - Search edge cases tested
+ - Authentication and authorization behavior verified where applicable
+ - Postman API testing completed
+ - Search and discovery workflow tested end-to-end
+
+ ---
 
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
