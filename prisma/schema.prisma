@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  password  String
-  role      String   @default("USER")
-  company   Company? @relation("CompanyOwner")
-  orders    Order[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  password     String
+  role         String        @default("USER")
+  company      Company?      @relation("CompanyOwner")
+  orders       Order[]
+  applications Application[]
 }
 
 model Product {
@@ -84,46 +85,44 @@ model CompanyKyc {
 }
 
 model Job {
-  id             Int       @id @default(autoincrement())
+  id             Int                 @id @default(autoincrement())
   companyId      Int
   title          String
   description    String
   location       String?
   employmentType String?
-  status         String    @default("DRAFT")
+  status         String              @default("DRAFT")
   publishedAt    DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  company     Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  thresholds  JobSkillThreshold[]
-  assessments JobAssessment[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assessments    JobAssessment?
+  thresholds     JobSkillThreshold[]
+  applications   Application[]
 
   @@index([companyId])
   @@index([status])
 }
 
 model Competency {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
+  id          Int                 @id @default(autoincrement())
+  code        String              @unique
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  thresholds JobSkillThreshold[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  thresholds  JobSkillThreshold[]
 }
 
 model JobSkillThreshold {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   jobId        Int
   competencyId Int
   minimumLevel Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  job        Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  competency Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  competency   Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  job          Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@unique([jobId, competencyId])
   @@index([jobId])
@@ -132,14 +131,29 @@ model JobSkillThreshold {
 
 model JobAssessment {
   id        Int       @id @default(autoincrement())
-  jobId     Int
+  jobId     Int       @unique
   token     String    @unique
   status    String    @default("ACTIVE")
   createdAt DateTime  @default(now())
   expiresAt DateTime?
+  job       Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
-  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  @@unique([jobId])
   @@index([jobId])
+}
+
+model Application {
+  id        Int      @id @default(autoincrement())
+  jobId     Int
+  studentId Int
+  status    String   @default("APPLIED")
+  appliedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job     Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, studentId])
+  @@index([jobId])
+  @@index([studentId])
+  @@index([status])
 }

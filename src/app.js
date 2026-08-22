@@ -56,6 +56,7 @@ const jobRoutes = require("./routes/jobRoutes");
 const cacheMetricsRoutes = require("./routes/cacheMetricsRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const discoveryRoutes = require("./routes/discoveryRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 
 
 // Public routes
@@ -78,6 +79,7 @@ app.use("/api", apiRateLimiter);
 app.use("/", mockRoutes);
 app.use("/", workerRoutes);
 app.use("/", jobRoutes);
+app.use("/", applicationRoutes);
 app.use("/", cacheMetricsRoutes);
 
 // Global production-safe error handler

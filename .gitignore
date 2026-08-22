@@ -21,3 +21,7 @@ coverage/
 
 
 .github/workflows/test.yml
+
+
+
+*.dump

@@ -11,7 +11,7 @@ async function signup(userData) {
         name: userData.name,
         email: userData.email,
         password: hashedPassword,
-        role: "USER",
+        role: "STUDENT",
     });
 
     return newUser;

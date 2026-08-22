@@ -67,6 +67,29 @@ The implementation includes:
 - Dedicated discovery controller, service, repository, and routes
 - Postman API testing
 
+### Phase 2 · Day 4
+
+**Task 4 – Job Applications & Candidate Shortlisting**
+
+The objective of Day 4 was to implement the job application and candidate shortlisting workflow, allowing students to apply for published jobs and companies to review and shortlist applicants.
+
+The implementation includes:
+
+- Student application API
+- Published-job application validation
+- Duplicate application prevention
+- Student application listing
+- Company applicant listing
+- Company ownership authorization
+- Candidate shortlisting API
+- Application status management
+- `APPLIED` and `SHORTLISTED` application statuses
+- Dedicated application controller, service, repository, validation, and routes
+- PostgreSQL persistence for applications
+- Role-based access control for students and companies
+- Postman API testing
+- End-to-end application and shortlisting workflow verification
+
 ---
 
 # 🛠️ Tech Stack
@@ -103,6 +126,17 @@ The implementation includes:
 - Competency-based search
 - Relevance-based ranking
 
+### Job Applications & Shortlisting
+
+- Prisma-based application management
+- Student job applications
+- Published-job validation
+- Duplicate application prevention
+- Company applicant management
+- Candidate shortlisting
+- Application status tracking
+- Role-based access control
+
 ### Testing
 
 - Jest
@@ -129,9 +163,11 @@ p2task-node-server/
 │
 ├── prisma/
 │   ├── migrations/
-│   │   ├── 20260820124500_task1_company_marketplace/
+│   │   ├── 20260820120000_task1_company_marketplace/
 │   │   │   └── migration.sql
-│   │   └── task2_job_skill_thresholds/
+│   │   ├── 20260820130000_task2_job_skill_thresholds/
+│   │   │   └── migration.sql
+│   │   └── 20260822094442_task4_applications_shortlisting/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -146,7 +182,8 @@ p2task-node-server/
 │   │   ├── authController.js
 │   │   ├── companyController.js
 │   │   ├── jobController.js
-│   │   └── discoveryController.js
+│   │   ├── discoveryController.js
+│   │   └── applicationController.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
@@ -161,13 +198,15 @@ p2task-node-server/
 │   │   ├── userRepository.js
 │   │   ├── companyRepository.js
 │   │   ├── jobRepository.js
-│   │   └── discoveryRepository.js
+│   │   ├── discoveryRepository.js
+│   │   └── applicationRepository.js
 │   │
 │   ├── routes/
 │   │   ├── authRoutes.js
 │   │   ├── companyRoutes.js
 │   │   ├── jobRoutes.js
-│   │   └── discoveryRoutes.js
+│   │   ├── discoveryRoutes.js
+│   │   └── applicationRoutes.js
 │   │
 │   ├── services/
 │   │   ├── authService.js
@@ -175,13 +214,15 @@ p2task-node-server/
 │   │   ├── jobService.js
 │   │   ├── assessmentService.js
 │   │   ├── thresholdRulesEngine.js
-│   │   └── discoveryService.js
+│   │   ├── discoveryService.js
+│   │   └── applicationService.js
 │   │
 │   ├── validations/
 │   │   ├── authValidation.js
 │   │   ├── companyValidation.js
 │   │   ├── jobValidation.js
-│   │   └── discoveryValidation.js
+│   │   ├── discoveryValidation.js
+│   │   └── applicationValidation.js
 │   │
 │   ├── app.js
 │   └── server.js
@@ -212,6 +253,7 @@ p2task-node-server/
 | Method | Endpoint | Authentication | Description |
 |--------|----------|----------------|-------------|
 | `GET` | `/health` | Public | Checks whether the backend server is running |
+| `POST` | `/auth/signup` | Public | Registers a new user account |
 | `POST` | `/auth/login` | Public | Authenticates a user and returns a JWT |
 | `POST` | `/companies/signup` | Public | Registers a company and creates its user, profile, and initial KYC record |
 | `GET` | `/companies/me` | JWT + COMPANY role | Returns the authenticated company's details, profile, and KYC information |
@@ -221,6 +263,10 @@ p2task-node-server/
 | `POST` | `/jobs/:id/evaluate` | JWT + COMPANY role | Evaluates candidate skills against the job's skill thresholds |
 | `GET` | `/jobs/search` | Public | Searches and filters published jobs with ranked results |
 | `GET` | `/jobs/discover` | Public | Discovers published jobs using search, filtering, and ranking criteria |
+| `POST` | `/jobs/:id/applications` | JWT + STUDENT role | Allows a student to apply to a published job |
+| `GET` | `/applications` | JWT + STUDENT role | Returns all applications submitted by the authenticated student |
+| `GET` | `/jobs/:id/applications` | JWT + COMPANY role | Returns applications submitted for a specific company job |
+| `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job |
 
 ---
 
@@ -340,6 +386,32 @@ Future areas will include:
 - Production-oriented backend architecture
 
 > These technologies will be introduced progressively as the corresponding Phase 2 tasks are implemented.
+
+---
+
+## Phase 2 · Day 4
+### Task 4 – Job Applications & Candidate Shortlisting
+
+**Status: ✅ COMPLETED**
+
+### Completed
+ - Student application service implemented
+ - Student job application functionality implemented
+ - Published-job application validation implemented
+ - Duplicate application prevention implemented
+ - Student application listing implemented
+ - Company application listing implemented
+ - Company job ownership authorization implemented
+ - Candidate shortlisting functionality implemented
+ - Application status management implemented
+ - `APPLIED` and `SHORTLISTED` statuses verified
+ - Student and company role-based access control verified
+ - Application request validation implemented
+ - Application persistence and database relationships verified
+ - Postman API testing completed
+ - Student application workflow tested end-to-end
+ - Company applicant review workflow tested end-to-end
+ - Candidate shortlisting workflow tested end-to-end
 
 ---
 
