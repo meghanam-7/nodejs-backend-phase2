@@ -90,6 +90,31 @@ The implementation includes:
 - Postman API testing
 - End-to-end application and shortlisting workflow verification
 
+### Phase 2 · Day 5
+
+**Task 5 – Marketplace Integration & Company Portal v1**
+
+The objective of Day 5 was to stabilize and verify the marketplace APIs through an end-to-end marketplace workflow, ensuring that companies can publish jobs, students can apply, and companies can review and shortlist candidates with changes persisted correctly.
+
+The implementation includes:
+
+- Marketplace integration verification
+- End-to-end company job publishing workflow
+- Student job application workflow verification
+- Company applicant listing verification
+- Candidate shortlisting workflow verification
+- Application status transition from `APPLIED` to `SHORTLISTED`
+- Company ownership authorization verification
+- Student and company role-based access control verification
+- Duplicate application prevention verification
+- Duplicate shortlisting prevention verification
+- API response and error-handling verification
+- PostgreSQL persistence verification
+- Real database state validation after marketplace operations
+- Postman API testing
+- End-to-end marketplace workflow testing
+- Marketplace failure and edge-case testing
+
 ---
 
 # 🛠️ Tech Stack
@@ -136,6 +161,19 @@ The implementation includes:
 - Candidate shortlisting
 - Application status tracking
 - Role-based access control
+
+### Marketplace Integration & Company Portal
+
+- End-to-end marketplace workflow
+- Company job publishing
+- Student application workflow
+- Company applicant review
+- Candidate shortlisting
+- Application status transitions
+- Company ownership authorization
+- Student and company role-based access control
+- Marketplace edge-case validation
+- PostgreSQL persistence verification
 
 ### Testing
 
@@ -346,6 +384,7 @@ Determine Eligibility
 ---
 
 ## Phase 2 · Day 3
+
 ### Task 3 – Search & Discovery
 
 **Status: ✅ COMPLETED**
@@ -367,29 +406,8 @@ Determine Eligibility
 
  ---
 
-# 🔮 Upcoming Technologies / Phase 2 Roadmap
-
-The upcoming Phase 2 tasks will progressively extend the marketplace backend.
-
-Future areas will include:
-
-- Advanced marketplace data modelling
-- Company profile management
-- KYC workflow expansion
-- Marketplace discovery
-- Search and filtering
-- Matching and recommendation logic
-- Transactions and business workflows
-- Candidate and assessment workflows
-- Additional security and authorization
-- Performance and scalability improvements
-- Production-oriented backend architecture
-
-> These technologies will be introduced progressively as the corresponding Phase 2 tasks are implemented.
-
----
-
 ## Phase 2 · Day 4
+
 ### Task 4 – Job Applications & Candidate Shortlisting
 
 **Status: ✅ COMPLETED**
@@ -412,6 +430,56 @@ Future areas will include:
  - Student application workflow tested end-to-end
  - Company applicant review workflow tested end-to-end
  - Candidate shortlisting workflow tested end-to-end
+
+---
+
+## Phase 2 · Day 5
+### Task 5 – Marketplace Integration & Company Portal v1
+
+**Status: ✅ COMPLETED**
+
+### Completed
+ - Marketplace integration and API stabilization completed
+ - End-to-end marketplace workflow verified
+ - Company job publishing workflow verified
+ - Student job application workflow verified
+ - Company applicant listing workflow verified
+ - Candidate shortlisting workflow verified
+ - `APPLIED` → `SHORTLISTED` status transition verified
+ - Company ownership authorization verified
+ - Student and company role-based access control verified
+ - Duplicate application prevention verified
+ - Duplicate shortlisting prevention verified
+ - Marketplace error and edge-case scenarios tested
+ - API responses and persistence behavior verified
+ - PostgreSQL application state verified after shortlisting
+ - Postman API testing completed
+ - End-to-end marketplace flow tested successfully
+ - Marketplace integration confirmed demo-ready
+
+---
+
+# 🔮 Upcoming Technologies / Phase 2 Roadmap
+
+The upcoming Phase 2 tasks will progressively extend the marketplace backend and company portal.
+
+Future areas will include:
+
+- Advanced marketplace data modelling
+- Company portal enhancements
+- Company profile management
+- KYC workflow expansion
+- Marketplace discovery
+- Search and filtering
+- Matching and recommendation logic
+- Candidate and assessment workflows
+- Transactions and business workflows
+- Additional security and authorization
+- Performance and scalability improvements
+- Production-oriented backend architecture
+- Further marketplace integration and stabilization
+
+> These technologies and capabilities will be introduced progressively as the corresponding Phase 2 tasks are implemented.
 
 ---
 
