@@ -115,6 +115,36 @@ The implementation includes:
 - End-to-end marketplace workflow testing
 - Marketplace failure and edge-case testing
 
+### Phase 2 · Day 6
+
+**Task 6 – Payment Integration & Razorpay Order Management**
+
+The objective of Day 6 was to implement and verify the payment infrastructure using Razorpay, enabling authenticated users to create payment orders while maintaining payment records and status information in PostgreSQL.
+
+The implementation includes:
+
+- Razorpay payment gateway integration
+- Payment order creation workflow
+- Authenticated payment API access
+- Payment service and repository implementation
+- Razorpay order ID generation and persistence
+- Payment record creation in PostgreSQL
+- Payment status management with default `CREATED` status
+- Support for payment amount and currency
+- Razorpay payment ID and receipt tracking
+- Payment-to-user relationship through Prisma
+- Payment database migration
+- Payment API route integration
+- Payment request validation
+- Payment controller and service-layer separation
+- Payment repository and database persistence
+- PostgreSQL payment table verification
+- Prisma migration status verification
+- Real database state validation after payment order creation
+- Razorpay integration dependency configuration
+- Integration with the existing application routing
+- Authentication and authorization verification for payment APIs
+
 ---
 
 # 🛠️ Tech Stack
@@ -175,6 +205,19 @@ The implementation includes:
 - Marketplace edge-case validation
 - PostgreSQL persistence verification
 
+### Payment Integration
+
+- Razorpay
+- Razorpay order creation
+- Payment order persistence
+- Payment status tracking
+- Razorpay order ID validation
+- Razorpay payment ID persistence
+- Payment receipt tracking
+- User-payment relationship management
+- Payment API integration
+- PostgreSQL payment persistence
+
 ### Testing
 
 - Jest
@@ -205,7 +248,9 @@ p2task-node-server/
 │   │   │   └── migration.sql
 │   │   ├── 20260820130000_task2_job_skill_thresholds/
 │   │   │   └── migration.sql
-│   │   └── 20260822094442_task4_applications_shortlisting/
+│   │   ├── 20260822094442_task4_applications_shortlisting/
+│   │   │   └── migration.sql
+│   │   └── 20260823065440_task6_payment_model/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -221,7 +266,8 @@ p2task-node-server/
 │   │   ├── companyController.js
 │   │   ├── jobController.js
 │   │   ├── discoveryController.js
-│   │   └── applicationController.js
+│   │   ├── applicationController.js
+│   │   └── paymentController.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
@@ -237,14 +283,16 @@ p2task-node-server/
 │   │   ├── companyRepository.js
 │   │   ├── jobRepository.js
 │   │   ├── discoveryRepository.js
-│   │   └── applicationRepository.js
+│   │   ├── applicationRepository.js
+│   │   └── paymentRepository.js
 │   │
 │   ├── routes/
 │   │   ├── authRoutes.js
 │   │   ├── companyRoutes.js
 │   │   ├── jobRoutes.js
 │   │   ├── discoveryRoutes.js
-│   │   └── applicationRoutes.js
+│   │   ├── applicationRoutes.js
+│   │   └── paymentRoutes.js
 │   │
 │   ├── services/
 │   │   ├── authService.js
@@ -253,14 +301,16 @@ p2task-node-server/
 │   │   ├── assessmentService.js
 │   │   ├── thresholdRulesEngine.js
 │   │   ├── discoveryService.js
-│   │   └── applicationService.js
+│   │   ├── applicationService.js
+│   │   └── paymentService.js
 │   │
 │   ├── validations/
 │   │   ├── authValidation.js
 │   │   ├── companyValidation.js
 │   │   ├── jobValidation.js
 │   │   ├── discoveryValidation.js
-│   │   └── applicationValidation.js
+│   │   ├── applicationValidation.js
+│   │   └── paymentValidation.js
 │   │
 │   ├── app.js
 │   └── server.js
@@ -305,6 +355,9 @@ p2task-node-server/
 | `GET` | `/applications` | JWT + STUDENT role | Returns all applications submitted by the authenticated student |
 | `GET` | `/jobs/:id/applications` | JWT + COMPANY role | Returns applications submitted for a specific company job |
 | `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job |
+| `POST` | `/payments/create-order` | JWT + STUDENT role | Creates a Razorpay payment order and stores the payment record |
+| `POST` | `/payments/verify` | JWT + STUDENT role | Verifies a Razorpay payment signature and updates the payment status |
+| `GET` | `/payments` | JWT + STUDENT role | Returns payment records belonging to the authenticated student |
 
 ---
 
@@ -459,9 +512,39 @@ Determine Eligibility
 
 ---
 
+## Phase 2 · Day 6
+### Task 6 – Payment Integration & Razorpay Order Management
+
+**Status: ✅ COMPLETED**
+
+### Completed
+ - Razorpay payment gateway integration completed
+ - Payment order creation workflow implemented and verified
+ - Authenticated payment API access verified
+ - Payment service and repository layers implemented
+ - Razorpay order ID generation and persistence verified
+ - Payment records persisted successfully in PostgreSQL
+ - Payment status tracking with `CREATED` status implemented
+ - Payment amount and currency handling verified
+ - Razorpay payment ID and receipt tracking implemented
+ - User-to-payment relationship implemented through Prisma
+ - Payment database migration created and applied successfully
+ - Payment API routes integrated into the application
+ - Payment request validation implemented
+ - Payment controller, service, and repository separation completed
+ - PostgreSQL `Payment` table structure verified
+ - Prisma migration status verified
+ - Real database payment records verified after order creation
+ - Razorpay dependency configuration completed
+ - Payment APIs integrated with the existing application
+ - Payment authentication and authorization verified
+ - Payment integration confirmed demo-ready
+
+---
+
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
-The upcoming Phase 2 tasks will progressively extend the marketplace backend and company portal.
+The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, and payment infrastructure.
 
 Future areas will include:
 
@@ -473,7 +556,8 @@ Future areas will include:
 - Search and filtering
 - Matching and recommendation logic
 - Candidate and assessment workflows
-- Transactions and business workflows
+- Payment and transaction workflows
+- Razorpay payment verification and transaction management
 - Additional security and authorization
 - Performance and scalability improvements
 - Production-oriented backend architecture

@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "node src/server.js",
-  "dev": "nodemon src/server.js",
-  "test": "jest --runInBand"
-},
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand"
+  },
   "prisma": {
     "seed": "node prisma/seed.js"
   },
@@ -31,6 +31,7 @@
     "jsonwebtoken": "^9.0.3",
     "node-cache": "^5.1.2",
     "rate-limit-redis": "^6.0.1",
+    "razorpay": "^2.9.8",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
   },

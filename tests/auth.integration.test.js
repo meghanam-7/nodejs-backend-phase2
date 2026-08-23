@@ -22,7 +22,7 @@ describe("Authentication API", () => {
             expect.objectContaining({
                 name: user.name,
                 email: user.email,
-                role: "USER",
+                role: "STUDENT",
             })
         );
 
@@ -51,7 +51,7 @@ describe("Authentication API", () => {
         expect(response.body.user).toEqual(
             expect.objectContaining({
                 email: user.email,
-                role: "USER",
+                role: "STUDENT",
             })
         );
 
@@ -95,7 +95,7 @@ describe("Authentication API", () => {
             expect.arrayContaining([
                 expect.objectContaining({
                     email: user.email,
-                    role: "USER",
+                    role: "STUDENT",
                 }),
             ])
         );
