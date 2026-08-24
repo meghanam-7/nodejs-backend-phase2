@@ -145,6 +145,43 @@ The implementation includes:
 - Integration with the existing application routing
 - Authentication and authorization verification for payment APIs
 
+### Phase 2 · Day 7
+
+**Task 7 – Pay-per-Application Flow**
+
+The objective of Day 7 was to implement and verify a pay-per-application workflow using Razorpay, ensuring that students must complete and verify a successful payment before they can apply to a published job.
+
+The implementation includes:
+
+- Pay-per-application payment workflow
+- Razorpay test mode integration
+- Payment order creation for a specific job
+- Payment-to-job relationship through Prisma
+- Payment-to-user relationship through Prisma
+- Published-job validation before payment creation
+- Razorpay order creation and persistence
+- Payment verification workflow
+- Razorpay payment ID tracking
+- Razorpay order and payment ownership validation
+- Captured payment status verification
+- Payment status transition from `CREATED` to `CAPTURED`
+- Successful payment verification persistence in PostgreSQL
+- Payment gate before job application
+- Prevention of job application without a successful payment
+- Student application workflow after successful payment
+- Existing duplicate application prevention
+- Payment controller and service-layer integration
+- Payment repository updates for job association and payment verification
+- Payment API validation
+- Razorpay checkout integration through a test HTML page
+- End-to-end payment and application workflow testing
+- PostgreSQL payment and application state validation
+- Prisma schema migration for payment-to-job relationship
+- Prisma migration and schema validation
+- Jest integration test verification
+- Real database state validation after successful payment and application
+- End-to-end Task 7 workflow confirmed demo-ready
+
 ---
 
 # 🛠️ Tech Stack
@@ -208,14 +245,21 @@ The implementation includes:
 ### Payment Integration
 
 - Razorpay
-- Razorpay order creation
+- Razorpay Test Mode
+- Razorpay Checkout
+- Payment order creation
+- Job-specific payment orders
+- Payment-to-user relationship
+- Payment-to-job relationship
 - Payment order persistence
 - Payment status tracking
 - Razorpay order ID validation
 - Razorpay payment ID persistence
 - Payment receipt tracking
-- User-payment relationship management
-- Payment API integration
+- Payment verification
+- `CREATED` → `CAPTURED` payment status transition
+- Pay-per-application payment gate
+- Payment-gated job applications
 - PostgreSQL payment persistence
 
 ### Testing
@@ -224,6 +268,8 @@ The implementation includes:
 - Supertest
 - Postman
 - Prisma Studio
+- Razorpay Test Checkout
+- End-to-end payment and application testing
 
 ### Documentation
 
@@ -250,7 +296,9 @@ p2task-node-server/
 │   │   │   └── migration.sql
 │   │   ├── 20260822094442_task4_applications_shortlisting/
 │   │   │   └── migration.sql
-│   │   └── 20260823065440_task6_payment_model/
+│   │   ├── 20260823065440_task6_payment_model/
+│   │   │   └── migration.sql
+│   │   └── 20260824095038_task7_payment_job_relation/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -315,6 +363,9 @@ p2task-node-server/
 │   ├── app.js
 │   └── server.js
 │
+├── public/
+│   └── payment.html
+│
 ├── tests/
 │   ├── setup.js
 │   ├── auth.integration.test.js
@@ -351,12 +402,12 @@ p2task-node-server/
 | `POST` | `/jobs/:id/evaluate` | JWT + COMPANY role | Evaluates candidate skills against the job's skill thresholds |
 | `GET` | `/jobs/search` | Public | Searches and filters published jobs with ranked results |
 | `GET` | `/jobs/discover` | Public | Discovers published jobs using search, filtering, and ranking criteria |
-| `POST` | `/jobs/:id/applications` | JWT + STUDENT role | Allows a student to apply to a published job |
+| `POST` | `/jobs/:id/applications` | JWT + STUDENT role | Allows a student to apply to a published job after successful payment |
 | `GET` | `/applications` | JWT + STUDENT role | Returns all applications submitted by the authenticated student |
 | `GET` | `/jobs/:id/applications` | JWT + COMPANY role | Returns applications submitted for a specific company job |
 | `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job |
-| `POST` | `/payments/create-order` | JWT + STUDENT role | Creates a Razorpay payment order and stores the payment record |
-| `POST` | `/payments/verify` | JWT + STUDENT role | Verifies a Razorpay payment signature and updates the payment status |
+| `POST` | `/payments/orders` | JWT | Creates a Razorpay payment order for a specific job and stores the payment record |
+| `POST` | `/payments/verify` | JWT | Verifies a Razorpay payment and updates the payment status to `CAPTURED` |
 | `GET` | `/payments` | JWT + STUDENT role | Returns payment records belonging to the authenticated student |
 
 ---
@@ -544,7 +595,7 @@ Determine Eligibility
 
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
-The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, and payment infrastructure.
+The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, payment infrastructure, and transaction workflows.
 
 Future areas will include:
 
@@ -558,6 +609,8 @@ Future areas will include:
 - Candidate and assessment workflows
 - Payment and transaction workflows
 - Razorpay payment verification and transaction management
+- Pay-per-application workflows
+- Application and payment state management
 - Additional security and authorization
 - Performance and scalability improvements
 - Production-oriented backend architecture

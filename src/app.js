@@ -19,6 +19,7 @@ if (process.env.NODE_ENV === "production") {
 // Middleware
 app.use(timeout("10s"));
 app.use(express.json({ limit: "1mb" }));
+app.use(express.static("public"));
 app.use(helmet());
 
 // Enforce HTTPS in production

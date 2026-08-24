@@ -1,4 +1,5 @@
 const applicationRepository = require("../persistence/applicationRepository");
+const paymentRepository = require("../persistence/paymentRepository");
 
 const applyToJob = async (studentId, jobId) => {
   const job = await applicationRepository.findJobById(jobId);
@@ -9,6 +10,18 @@ const applyToJob = async (studentId, jobId) => {
 
   if (job.status !== "PUBLISHED") {
     throw new Error("Applications are only allowed for published jobs");
+  }
+
+  const payment =
+    await paymentRepository.findCapturedPaymentForJob(
+      studentId,
+      jobId
+    );
+
+  if (!payment) {
+    throw new Error(
+      "A successful payment is required before applying to this job"
+    );
   }
 
   const existingApplication =
