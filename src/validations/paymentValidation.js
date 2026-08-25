@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const createPaymentValidation = [
     body("jobId")
@@ -20,7 +20,29 @@ const verifyPaymentValidation = [
         .withMessage("Razorpay payment ID is required"),
 ];
 
+const paymentIdValidation = [
+    param("paymentId")
+        .isInt({ min: 1 })
+        .withMessage("Payment ID must be a positive integer"),
+];
+
+const refundValidation = [
+    body("amount")
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage("Refund amount must be a positive integer"),
+
+    body("reason")
+        .optional()
+        .isString()
+        .trim()
+        .isLength({ max: 500 })
+        .withMessage("Refund reason must not exceed 500 characters"),
+];
+
 module.exports = {
     createPaymentValidation,
     verifyPaymentValidation,
+    paymentIdValidation,
+    refundValidation,
 };
