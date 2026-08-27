@@ -84,16 +84,17 @@ const createRefund = async (req, res, next) => {
             message: "Refund created successfully",
             data: result,
         });
-        } catch (error) {
-        console.error("REFUND ERROR:", error);
+    } catch (error) {
+        console.error("REFUND ERROR:", {
+            message: error.message,
+            code: error.code,
+            statusCode: error.statusCode,
+        });
 
         return res.status(error.statusCode || 500).json({
             success: false,
-            message:
-                error?.error?.description ||
-                error?.message ||
-                "Refund failed",
-            code: error?.error?.code || null,
+            message: error.message || "Refund failed",
+            code: error.code || "REFUND_ERROR",
         });
     }
 };

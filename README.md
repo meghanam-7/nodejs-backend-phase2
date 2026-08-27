@@ -241,6 +241,65 @@ The implementation includes:
 - The application now handles this gateway rejection cleanly instead of returning a generic internal server error.
 - The refund failure is a Razorpay Test Mode/gateway limitation and does not indicate an incomplete refund implementation.
 
+### Phase 2 · Day 9
+
+**Task 9 – Failure Handling & Resilience**
+
+The objective of Day 9 was to implement and verify deterministic failure handling for payment operations, ensuring that invalid refund requests, Razorpay gateway failures, insufficient refund balance, and reconciliation failures are handled cleanly without corrupting local payment data.
+
+The implementation includes:
+
+- Deterministic payment failure handling
+- Refund validation failure handling
+- Prevention of refunds for non-existent payments
+- Payment ownership validation before refund processing
+- Prevention of refunds for payments belonging to another user
+- Prevention of refunds for non-captured payments
+- Validation for missing Razorpay payment IDs
+- Refund amount validation
+- Prevention of zero-value refunds
+- Prevention of refunds exceeding the original payment amount
+- Razorpay refund failure handling
+- Razorpay `BAD_REQUEST_ERROR` handling
+- Razorpay refund error normalization
+- Application-friendly refund error messages
+- Razorpay insufficient balance error detection
+- Deterministic `RAZORPAY_REFUND_INSUFFICIENT_BALANCE` error handling
+- Generic `RAZORPAY_REFUND_ERROR` handling for unknown refund failures
+- Preservation of original Razorpay errors for server-side debugging
+- Prevention of local refund persistence when Razorpay rejects a refund
+- Reconciliation failure handling
+- Prevention of reconciliation for non-existent payments
+- Payment ownership validation before reconciliation
+- Prevention of reconciliation without a Razorpay payment ID
+- Payment failure handling at the service layer
+- Payment error propagation through the controller layer
+- HTTP status code handling for Razorpay refund failures
+- Payment failure test coverage using Jest
+- Razorpay API mocking for deterministic failure scenarios
+- Validation of repository behavior during failed refund operations
+- Verification that failed Razorpay refunds do not create local refund records
+- Prisma schema validation completed successfully
+- Dedicated `payment.failure.test.js` test suite implemented
+- Dedicated payment failure test suite verified with **11/11 tests passing**
+- Complete existing Jest test suite verified with **31/31 tests passing**
+- Refund failure scenarios confirmed deterministic
+- Reconciliation failure scenarios confirmed deterministic
+- End-to-end payment failure handling confirmed demo-ready
+
+**Failure Handling Verification:**
+
+- Invalid Razorpay refund requests are converted into application-friendly errors.
+- Razorpay insufficient balance failures are detected and returned with a deterministic application error code.
+- Failed Razorpay refunds do not create local `Refund` records.
+- Invalid refund amounts are rejected before contacting Razorpay.
+- Unauthorized refund and reconciliation attempts are rejected.
+- Reconciliation cannot proceed when the Razorpay payment ID is missing.
+- All dedicated payment failure tests passed successfully.
+- The complete existing test suite passed successfully with **31/31 tests passing**.
+
+**Task 9 Status: ✅ COMPLETED**
+
 ---
 
 # 🛠️ Tech Stack
@@ -336,6 +395,11 @@ The implementation includes:
 - Reconciliation mismatch reason tracking
 - Payment-to-reconciliation relationship
 - Razorpay error handling
+- Deterministic payment failure handling
+- Refund failure handling
+- Razorpay insufficient-balance error handling
+- Application-friendly Razorpay error normalization
+- Prevention of local refund persistence after gateway rejection
 - PostgreSQL payment, refund, and reconciliation persistence
 
 ### Testing
@@ -349,6 +413,11 @@ The implementation includes:
 - Razorpay refund API testing
 - Payment receipt testing
 - Payment reconciliation testing
+- Payment failure testing
+- Refund validation failure testing
+- Razorpay gateway failure simulation
+- Insufficient balance failure simulation
+- Deterministic failure-path verification
 - End-to-end payment and application testing
 
 ### Documentation
@@ -454,11 +523,9 @@ p2task-node-server/
 │   ├── authorization.integration.test.js
 │   ├── company.integration.test.js
 │   ├── docs.integration.test.js
-│   └── health.integration.test.js
+│   ├── health.integration.test.js
+|   └── payment.failure.test.js
 │
-├── .github/
-│   └── workflows/
-│       └── test.yml
 │
 ├── package.json
 ├── package-lock.json
@@ -765,6 +832,59 @@ Determine Eligibility
 
 ---
 
+## Phase 2 · Day 9
+
+### Task 9: Failure Handling & Resilience (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+ - Payment failure handling workflow implemented
+ - Deterministic refund validation failures implemented
+ - Payment existence validation before refund processing implemented
+ - Payment ownership authorization for refund processing implemented
+ - Prevention of refunds for non-captured payments implemented
+ - Razorpay payment ID validation before refund processing implemented
+ - Refund amount validation implemented
+ - Prevention of zero or negative refund amounts implemented
+ - Prevention of refunds exceeding the original payment amount implemented
+ - Razorpay refund rejection handling implemented
+ - Razorpay `BAD_REQUEST_ERROR` handling implemented
+ - Razorpay insufficient balance failure detection implemented
+ - Razorpay refund errors converted into application-friendly errors
+ - Meaningful application-level error messages implemented for refund failures
+ - Original Razorpay error retained for server-side debugging
+ - Prevention of local refund persistence when Razorpay rejects a refund
+ - Reconciliation failure handling implemented
+ - Payment existence validation before reconciliation implemented
+ - Payment ownership authorization for reconciliation implemented
+ - Razorpay payment ID validation before reconciliation implemented
+ - Payment failure scenarios covered through automated tests
+ - Dedicated `payment.failure.test.js` test suite created
+ - Refund validation failure scenarios tested
+ - Razorpay refund rejection scenario tested
+ - Razorpay insufficient balance scenario tested
+ - Reconciliation failure scenarios tested
+ - Payment service failure paths verified
+ - Payment repository interaction verified during failure scenarios
+ - Prisma schema validation completed successfully
+ - Dedicated payment failure test suite verified with **11/11 tests passing**
+ - Full Jest test suite verified with **31/31 tests passing**
+ - Deterministic failure responses confirmed
+ - Task 9 failure handling and resilience confirmed demo-ready
+
+### Failure Handling Note
+
+ - Razorpay refund requests can be rejected by the gateway with `BAD_REQUEST_ERROR`
+ - Razorpay insufficient balance failures are detected and mapped to a dedicated application error code
+ - Razorpay gateway rejection does not create a false local refund record
+ - Validation failures are rejected before any Razorpay refund request is made
+ - Reconciliation failures are handled without creating invalid reconciliation state
+ - Payment failure paths are covered by automated Jest tests
+ - Failure handling is deterministic and prevents inconsistent local payment data
+
+---
+
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
 The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, payment infrastructure, transaction workflows, and financial operations.
@@ -787,6 +907,8 @@ Future areas will include:
 - Refund processing and refund lifecycle management
 - Payment reconciliation and gateway transaction matching
 - Financial transaction tracking
+- Payment failure handling and resilience
+- Deterministic gateway error handling
 - Additional security and authorization
 - Performance and scalability improvements
 - Production-oriented backend architecture

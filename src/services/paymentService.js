@@ -227,7 +227,7 @@ const createRefund = async (
     }
 
     const refundAmount =
-        amount || payment.amount;
+    amount ?? payment.amount;
 
     if (refundAmount <= 0) {
         throw new Error(
