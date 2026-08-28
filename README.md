@@ -374,6 +374,50 @@ The implementation includes:
 
 **Task 10 Status: ✅ COMPLETED**
 
+### Phase 2 · Day 11
+
+**Task 11 – Offer Generation & E-Sign Design**
+
+The objective of Day 11 was to implement the offer generation workflow for shortlisted candidates and design the offer data model to support a future e-signature integration while maintaining company ownership and role-based authorization.
+
+The implementation includes:
+
+- Offer data model implementation using Prisma
+- Offer persistence in PostgreSQL
+- Application-to-offer relationship
+- Student-to-offer relationship
+- Job-to-offer relationship
+- One-offer-per-application constraint
+- Offer compensation and currency fields
+- Offer joining date support
+- Offer lifecycle status tracking
+- Offer document URL support
+- E-sign provider tracking
+- E-sign status tracking
+- E-sign request ID tracking
+- Signed timestamp tracking
+- Company ownership validation during offer generation
+- Prevention of unauthorized companies generating offers
+- Validation that the application exists
+- Validation that only shortlisted candidates can receive offers
+- Prevention of duplicate offer generation
+- Compensation validation
+- Offer generation through the service layer
+- Student offer retrieval
+- Specific offer retrieval with application and job details
+- Company job-offer retrieval
+- Role-based access control for offer APIs
+- Request validation for offer creation
+- Prisma migration for the Offer model
+- PostgreSQL persistence verification
+- E-sign workflow design using `eSignProvider`, `eSignStatus`, `eSignRequestId`, and `signedAt`
+- Offer creation with `DRAFT` status
+- Initial eSign state using `NOT_STARTED`
+- End-to-end offer generation and retrieval testing through Postman
+- Existing automated test suite verification with all 33 tests passing
+
+**Task 11 Status: ✅ COMPLETED**
+
 ---
 
 
@@ -434,6 +478,34 @@ The implementation includes:
 - Student and company role-based access control
 - Marketplace edge-case validation
 - PostgreSQL persistence verification
+
+### Offer Generation & E-Sign Design
+
+- Prisma-based offer management
+- Offer generation for shortlisted candidates
+- Offer-to-application relationship
+- Offer-to-student relationship
+- Offer-to-job relationship
+- One-offer-per-application constraint
+- Offer compensation and currency tracking
+- Joining date support
+- Offer lifecycle status tracking
+- Offer document URL support
+- E-sign provider tracking
+- E-sign status tracking
+- E-sign request ID tracking
+- Signed timestamp tracking
+- Company ownership authorization
+- Shortlisted-candidate validation
+- Duplicate offer prevention
+- Compensation validation
+- Student offer retrieval
+- Specific offer retrieval
+- Company job-offer retrieval
+- `DRAFT` offer status
+- `NOT_STARTED` e-sign status
+- Future e-sign integration readiness
+- PostgreSQL offer persistence
 
 ### Payment Integration
 
@@ -515,6 +587,11 @@ The implementation includes:
 - Payment captured webhook testing
 - Payment failed webhook testing
 - End-to-end payment and application testing
+- Offer generation testing
+- Offer retrieval testing
+- Company job-offer retrieval testing
+- Offer authorization testing
+- Shortlisted-candidate offer validation testing
 
 ### Documentation
 
@@ -525,8 +602,6 @@ The implementation includes:
 - Git
 - GitHub
 - npm
-
----
 
 # 📁 Project Structure
 
@@ -544,10 +619,12 @@ p2task-node-server/
 │   │   ├── 20260823065440_task6_payment_model/
 │   │   │   └── migration.sql
 │   │   ├── 20260824095038_task7_payment_job_relation/
-│   │   |   └── migration.sql
-|   |   ├── 20260825115628_task8_receipts_refunds_reconciliation/
-│   │   |   └── migration.sql
-|   |   └── 20260827134634_task10_payment_idempotency/
+│   │   │   └── migration.sql
+│   │   ├── 20260825115628_task8_receipts_refunds_reconciliation/
+│   │   │   └── migration.sql
+│   │   ├── 20260827134634_task10_payment_idempotency/
+│   │   │   └── migration.sql
+│   │   └── 20260828105957_task11_offer/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -564,7 +641,8 @@ p2task-node-server/
 │   │   ├── jobController.js
 │   │   ├── discoveryController.js
 │   │   ├── applicationController.js
-│   │   └── paymentController.js
+│   │   ├── paymentController.js
+│   │   └── offerController.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
@@ -581,7 +659,8 @@ p2task-node-server/
 │   │   ├── jobRepository.js
 │   │   ├── discoveryRepository.js
 │   │   ├── applicationRepository.js
-│   │   └── paymentRepository.js
+│   │   ├── paymentRepository.js
+│   │   └── offerRepository.js
 │   │
 │   ├── routes/
 │   │   ├── authRoutes.js
@@ -589,7 +668,8 @@ p2task-node-server/
 │   │   ├── jobRoutes.js
 │   │   ├── discoveryRoutes.js
 │   │   ├── applicationRoutes.js
-│   │   └── paymentRoutes.js
+│   │   ├── paymentRoutes.js
+│   │   └── offerRoutes.js
 │   │
 │   ├── services/
 │   │   ├── authService.js
@@ -599,7 +679,8 @@ p2task-node-server/
 │   │   ├── thresholdRulesEngine.js
 │   │   ├── discoveryService.js
 │   │   ├── applicationService.js
-│   │   └── paymentService.js
+│   │   ├── paymentService.js
+│   │   └── offerService.js
 │   │
 │   ├── validations/
 │   │   ├── authValidation.js
@@ -607,7 +688,8 @@ p2task-node-server/
 │   │   ├── jobValidation.js
 │   │   ├── discoveryValidation.js
 │   │   ├── applicationValidation.js
-│   │   └── paymentValidation.js
+│   │   ├── paymentValidation.js
+│   │   └── offerValidation.js
 │   │
 │   ├── app.js
 │   └── server.js
@@ -622,8 +704,7 @@ p2task-node-server/
 │   ├── company.integration.test.js
 │   ├── docs.integration.test.js
 │   ├── health.integration.test.js
-|   └── payment.failure.test.js
-│
+│   └── payment.failure.test.js
 │
 ├── package.json
 ├── package-lock.json
@@ -653,6 +734,10 @@ p2task-node-server/
 | `GET` | `/applications` | JWT + STUDENT role | Returns all applications submitted by the authenticated student |
 | `GET` | `/jobs/:id/applications` | JWT + COMPANY role | Returns applications submitted for a specific company job |
 | `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job |
+| `POST` | `/offers` | JWT + COMPANY role | Generates an offer for a shortlisted candidate |
+| `GET` | `/offers` | JWT + STUDENT role | Returns all offers belonging to the authenticated student |
+| `GET` | `/offers/:id` | JWT | Returns a specific offer for an authorized student or company |
+| `GET` | `/jobs/:jobId/offers` | JWT + COMPANY role | Returns all offers generated for a company-owned job |
 | `POST` | `/payments/orders` | JWT | Creates a Razorpay payment order for a specific job and stores the payment record |
 | `POST` | `/payments/verify` | JWT | Verifies a Razorpay payment and updates the payment status to `CAPTURED` |
 | `GET` | `/payments` | JWT + STUDENT role | Returns payment records belonging to the authenticated student |
@@ -1061,9 +1146,62 @@ Determine Eligibility
 
 ---
 
+## Phase 2 · Day 11
+
+### Task 11: Offer Generation & E-Sign Design (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- Offer data model implemented using Prisma
+- Offer database migration created and applied successfully
+- Offer persistence workflow implemented
+- Application-to-offer relationship implemented
+- Student-to-offer relationship implemented
+- Job-to-offer relationship implemented
+- One-offer-per-application database constraint implemented
+- Offer compensation and currency fields implemented
+- Offer joining date support implemented
+- Offer lifecycle status tracking implemented
+- Offer document URL support implemented
+- E-sign provider tracking implemented
+- E-sign status tracking implemented
+- E-sign request ID tracking implemented
+- Signed timestamp tracking implemented
+- Company ownership validation implemented during offer generation
+- Unauthorized company offer generation prevented
+- Application existence validation implemented
+- Shortlisted-candidate validation implemented
+- Duplicate offer generation prevention implemented
+- Compensation validation implemented
+- Offer generation service implemented
+- Student offer retrieval implemented
+- Specific offer retrieval implemented
+- Company job-offer retrieval implemented
+- Role-based authorization implemented for offer APIs
+- Offer request validation implemented using Express Validator
+- `DRAFT` offer status implemented
+- `NOT_STARTED` e-sign status implemented
+- E-sign integration data model prepared for future provider integration
+- Offer generation successfully tested through Postman
+- Student offer retrieval successfully tested through Postman
+- Specific offer retrieval successfully tested through Postman
+- Company job-offer retrieval successfully tested through Postman
+- Prisma schema validation completed successfully
+- Prisma migration status verified successfully
+- Offer repository module loading verified
+- Offer service module loading verified
+- Offer controller module loading verified
+- Offer routes module loading verified
+- Offer validation module loading verified
+- Existing automated test suite verified with **33/33 tests passing**
+
+---
+
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
-The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, payment infrastructure, transaction workflows, and financial operations.
+The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, offer and e-signature workflows, payment infrastructure, transaction workflows, and financial operations.
 
 Future areas will include:
 
@@ -1075,6 +1213,10 @@ Future areas will include:
 - Search and filtering
 - Matching and recommendation logic
 - Candidate and assessment workflows
+- Offer generation and offer lifecycle management
+- E-signature provider integration
+- Offer document generation and management
+- Candidate offer acceptance and rejection workflows
 - Payment and transaction workflows
 - Razorpay payment verification and transaction management
 - Pay-per-application workflows
@@ -1091,7 +1233,6 @@ Future areas will include:
 - Further marketplace integration and stabilization
 
 > These technologies and capabilities will be introduced progressively as the corresponding Phase 2 tasks are implemented.
-
 ---
 
 # ▶️ How to Run the Project

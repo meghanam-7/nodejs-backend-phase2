@@ -19,6 +19,7 @@ model User {
   orders       Order[]
   applications Application[]
   payments     Payment[]
+  offers       Offer[]
 }
 
 model Product {
@@ -101,6 +102,7 @@ model Job {
   thresholds     JobSkillThreshold[]
   applications   Application[]
   payments       Payment[]
+  offers         Offer[]
 
   @@index([companyId])
   @@index([status])
@@ -154,10 +156,44 @@ model Application {
   job     Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
   student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
+  offer Offer?
+
   @@unique([jobId, studentId])
   @@index([jobId])
   @@index([studentId])
   @@index([status])
+}
+
+model Offer {
+  id            Int @id @default(autoincrement())
+  applicationId Int @unique
+  studentId     Int
+  jobId         Int
+
+  compensation Int
+  currency     String    @default("INR")
+  joiningDate  DateTime?
+
+  status String @default("DRAFT")
+
+  documentUrl String?
+
+  eSignProvider  String?
+  eSignStatus    String    @default("NOT_STARTED")
+  eSignRequestId String?
+  signedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  student     User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  job         Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([jobId])
+  @@index([status])
+  @@index([eSignStatus])
 }
 
 model Payment {

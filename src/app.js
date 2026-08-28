@@ -71,6 +71,7 @@ const authRoutes = require("./routes/authRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const cacheMetricsRoutes = require("./routes/cacheMetricsRoutes");
 const companyRoutes = require("./routes/companyRoutes");
+const offerRoutes = require("./routes/offerRoutes");
 const discoveryRoutes = require("./routes/discoveryRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
@@ -80,6 +81,7 @@ app.use("/", healthRoutes);
 app.use("/", sampleRoutes);
 app.use("/", authRoutes);
 app.use("/", companyRoutes);
+app.use("/", offerRoutes);
 app.use("/", discoveryRoutes);
 
 // Swagger API documentation
@@ -114,6 +116,8 @@ app.use("/", cacheMetricsRoutes);
 // /api/payments/:paymentId/refund
 // /api/payments/:paymentId/reconcile
 app.use("/api", paymentRoutes);
+
+
 
 // Global production-safe error handler
 app.use((err, req, res, next) => {
