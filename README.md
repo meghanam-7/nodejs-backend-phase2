@@ -300,7 +300,82 @@ The implementation includes:
 
 **Task 9 Status: ✅ COMPLETED**
 
+### Phase 2 · Day 10
+
+**Task 10 – Payment Stabilization & Production Readiness**
+
+The objective of Day 10 was to stabilize the payment workflow and make the Razorpay integration resilient against duplicate requests, payment failures, webhook retries, refund failures, and gateway/local payment mismatches while also providing revenue analytics.
+
+The implementation includes:
+
+- Razorpay payment order creation
+- Payment persistence in PostgreSQL using Prisma
+- Payment verification against Razorpay
+- Payment ownership validation
+- Payment amount validation during verification
+- Payment status validation during verification
+- Idempotent payment order creation using `Idempotency-Key`
+- Prevention of duplicate payment orders for repeated requests
+- Database-level unique idempotency constraints
+- Idempotent refund creation using `Idempotency-Key`
+- Prevention of duplicate refunds for repeated requests
+- Refund amount validation
+- Prevention of refunds exceeding the original payment amount
+- Razorpay refund failure handling
+- Razorpay insufficient balance error detection
+- Application-friendly Razorpay refund errors
+- Payment reconciliation against Razorpay
+- Gateway amount and local amount comparison
+- Gateway payment status and local payment status comparison
+- Reconciliation mismatch detection
+- Reconciliation result persistence
+- Razorpay webhook endpoint implementation
+- Raw request body handling for webhook signature verification
+- Razorpay webhook HMAC-SHA256 signature verification
+- `RAZORPAY_WEBHOOK_SECRET` configuration
+- `X-Razorpay-Signature` validation
+- `payment.captured` webhook handling
+- `payment.failed` webhook handling
+- Duplicate webhook protection
+- Prevention of captured payments being changed back to `FAILED`
+- Graceful acknowledgement of unsupported Razorpay webhook events
+- Payment failure recovery through webhook processing
+- Revenue analytics implementation
+- Total payment count calculation
+- Captured payment count calculation
+- Failed payment count calculation
+- Created payment count calculation
+- Gross revenue calculation
+- Total refund calculation
+- Net revenue calculation
+- Total refund count calculation
+- Automated payment failure test coverage using Jest
+- Razorpay failure scenarios mocked for deterministic testing
+- Prisma schema validation completed successfully
+- Database migration created for payment and refund idempotency
+- Complete Jest test suite verified with **33/33 tests passing**
+- Webhook failure and duplicate processing verified through Postman
+- Payment idempotency verified through repeated Postman requests
+- Revenue analytics endpoint verified successfully
+- End-to-end payment stabilization workflow confirmed demo-ready
+
+**Payment Stabilization Verification:**
+
+- Repeated payment-order requests with the same `Idempotency-Key` return the existing payment order instead of creating a duplicate Razorpay order.
+- Missing `Idempotency-Key` requests are rejected with `IDEMPOTENCY_KEY_REQUIRED`.
+- Repeated webhook requests are detected and handled without applying the payment update twice.
+- `payment.failed` webhook processing correctly changes a pending local payment to `FAILED`.
+- A repeated `payment.failed` webhook is returned with `duplicate: true`.
+- Captured payments are protected from being changed back to `FAILED`.
+- Razorpay webhook signatures are verified using the configured webhook secret and raw request body.
+- Payment reconciliation compares local payment information with the Razorpay gateway state.
+- Revenue analytics correctly reports gross revenue, refunds, and net revenue.
+- The complete Jest test suite passed successfully with **33/33 tests passing**.
+
+**Task 10 Status: ✅ COMPLETED**
+
 ---
+
 
 # 🛠️ Tech Stack
 
@@ -400,7 +475,21 @@ The implementation includes:
 - Razorpay insufficient-balance error handling
 - Application-friendly Razorpay error normalization
 - Prevention of local refund persistence after gateway rejection
-- PostgreSQL payment, refund, and reconciliation persistence
+- Payment idempotency using `Idempotency-Key`
+- Idempotent payment order creation
+- Idempotent refund creation
+- Duplicate payment request protection
+- Duplicate refund request protection
+- Database-level unique idempotency constraints
+- Razorpay webhook integration
+- Raw request body handling for webhook signature verification
+- HMAC-SHA256 Razorpay webhook signature verification
+- `payment.captured` webhook handling
+- `payment.failed` webhook handling
+- Duplicate webhook protection
+- Webhook payment amount validation
+- Safe acknowledgement of unsupported webhook events
+- PostgreSQL payment, refund, reconciliation, and idempotency persistence
 
 ### Testing
 
@@ -418,6 +507,13 @@ The implementation includes:
 - Razorpay gateway failure simulation
 - Insufficient balance failure simulation
 - Deterministic failure-path verification
+- Payment idempotency testing
+- Refund idempotency testing
+- Razorpay webhook testing
+- Webhook signature verification testing
+- Duplicate webhook testing
+- Payment captured webhook testing
+- Payment failed webhook testing
 - End-to-end payment and application testing
 
 ### Documentation
@@ -449,7 +545,9 @@ p2task-node-server/
 │   │   │   └── migration.sql
 │   │   ├── 20260824095038_task7_payment_job_relation/
 │   │   |   └── migration.sql
-|   |   └── 20260825115628_task8_receipts_refunds_reconciliation/
+|   |   ├── 20260825115628_task8_receipts_refunds_reconciliation/
+│   │   |   └── migration.sql
+|   |   └── 20260827134634_task10_payment_idempotency/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -561,6 +659,8 @@ p2task-node-server/
 | `GET` | `/payments/:paymentId/receipt` | JWT | Retrieves the receipt details for a captured payment |
 | `POST` | `/payments/:paymentId/refund` | JWT | Creates a Razorpay refund request for a captured payment and persists the refund record |
 | `POST` | `/payments/:paymentId/reconcile` | JWT | Compares the local payment record with Razorpay gateway data and stores the reconciliation result |
+| `POST` | `/payments/webhook` | Public + Razorpay Signature | Receives Razorpay webhook events, verifies the webhook signature, and updates local payment status for supported events |
+| `GET` | `/payments/analytics/revenue` | JWT + COMPANY role | Returns revenue analytics including total payments, captured payments, failed payments, gross revenue, refunds, and net revenue |
 
 ---
 
@@ -882,6 +982,82 @@ Determine Eligibility
  - Reconciliation failures are handled without creating invalid reconciliation state
  - Payment failure paths are covered by automated Jest tests
  - Failure handling is deterministic and prevents inconsistent local payment data
+
+---
+
+## Phase 2 · Day 10
+
+### Task 10: Payment Stabilization & Production Readiness (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- Razorpay payment order creation workflow implemented
+- Payment persistence workflow implemented
+- Razorpay payment verification implemented
+- Payment ownership authorization implemented
+- Payment amount validation implemented during verification
+- Payment status validation implemented during verification
+- Payment order idempotency implemented using `Idempotency-Key`
+- Duplicate payment-order prevention implemented
+- Database-level unique payment idempotency constraint implemented
+- Refund idempotency implemented using `Idempotency-Key`
+- Duplicate refund prevention implemented
+- Database-level unique refund idempotency constraint implemented
+- Razorpay refund failure handling implemented
+- Razorpay insufficient balance detection implemented
+- Application-friendly Razorpay refund error handling implemented
+- Payment reconciliation workflow implemented
+- Local payment amount compared with Razorpay gateway amount
+- Local payment status compared with Razorpay gateway status
+- Reconciliation mismatch detection implemented
+- Reconciliation records persisted in the database
+- Razorpay webhook endpoint implemented
+- Raw request body handling implemented for webhook verification
+- Razorpay webhook HMAC-SHA256 signature verification implemented
+- `RAZORPAY_WEBHOOK_SECRET` configuration implemented
+- `X-Razorpay-Signature` validation implemented
+- `payment.captured` webhook processing implemented
+- `payment.failed` webhook processing implemented
+- Duplicate webhook protection implemented
+- Protection against changing captured payments back to `FAILED` implemented
+- Unsupported webhook events safely acknowledged
+- Payment failure recovery through webhook processing implemented
+- Revenue analytics endpoint implemented
+- Total payments metric implemented
+- Captured payments metric implemented
+- Failed payments metric implemented
+- Created payments metric implemented
+- Gross revenue metric implemented
+- Total refunded amount metric implemented
+- Net revenue metric implemented
+- Total refunds metric implemented
+- Payment failure tests maintained and verified
+- Razorpay failure scenarios tested with mocked gateway responses
+- Payment idempotency tested through Postman
+- Webhook signature verification tested through Postman
+- Duplicate webhook handling tested through Postman
+- Payment failure webhook tested through Postman
+- Revenue analytics endpoint tested through Postman
+- Prisma schema validation completed successfully
+- Task 10 payment idempotency migration created
+- Full Jest test suite verified with **33/33 tests passing**
+- Payment stabilization workflow confirmed demo-ready
+
+### Payment Stabilization Note
+
+- Payment order creation is protected against duplicate requests through an idempotency key
+- Refund creation is protected against duplicate requests through an idempotency key
+- Database unique constraints provide an additional layer of idempotency protection
+- Razorpay webhook signatures are verified using the raw request body and dedicated webhook secret
+- Duplicate webhook deliveries are safely detected and do not repeatedly update payment state
+- Captured payments cannot be incorrectly reverted to a failed state through a failure webhook
+- Failed payments can be recovered and reflected in local payment state through webhook processing
+- Payment reconciliation identifies mismatches between local records and Razorpay gateway data
+- Revenue analytics provides gross revenue, refunds, net revenue, and payment-status metrics
+- Automated tests confirm deterministic payment failure and refund behavior
+- Task 10 payment stabilization and production-readiness requirements are confirmed complete
 
 ---
 

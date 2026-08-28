@@ -82,7 +82,7 @@
 
             try {
                 const response = await fetch(
-                    "/payments/orders",
+                    "/api/payments/orders",
                     {
                         method: "POST",
                         headers: {
@@ -104,7 +104,6 @@
                     );
                 }
 
-                const payment = data.data.payment;
                 const razorpayOrder = data.data.razorpayOrder;
 
                 result.textContent =
@@ -178,7 +177,7 @@
         ) {
             try {
                 const response = await fetch(
-                    "/payments/verify",
+                    "/api/payments/verify",
                     {
                         method: "POST",
                         headers: {

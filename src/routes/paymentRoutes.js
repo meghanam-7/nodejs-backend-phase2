@@ -17,6 +17,20 @@ const {
 
 const paymentController = require("../controllers/paymentController");
 
+/*
+ * Razorpay webhook
+ *
+ * IMPORTANT:
+ * This route is intentionally public.
+ * Razorpay does not have our JWT token.
+ *
+ * Signature verification is handled inside the controller.
+ */
+router.post(
+    "/payments/webhook",
+    paymentController.handleWebhook
+);
+
 router.post(
     "/payments/orders",
     authenticateToken,
@@ -31,6 +45,12 @@ router.post(
     verifyPaymentValidation,
     validateRequest,
     paymentController.verifyPayment
+);
+
+router.get(
+    "/payments/analytics/revenue",
+    authenticateToken,
+    paymentController.getRevenueAnalytics
 );
 
 router.get(

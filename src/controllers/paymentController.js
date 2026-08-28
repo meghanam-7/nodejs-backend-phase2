@@ -5,15 +5,28 @@ const createPaymentOrder = async (req, res, next) => {
         const userId = req.user.id;
         const { jobId, amount } = req.body;
 
+        const idempotencyKey = req.get("Idempotency-Key");
+
+        if (!idempotencyKey) {
+            return res.status(400).json({
+                success: false,
+                message: "Idempotency-Key header is required",
+                code: "IDEMPOTENCY_KEY_REQUIRED",
+            });
+        }
+
         const result = await paymentService.createPaymentOrder(
             userId,
             jobId,
-            amount
+            amount,
+            idempotencyKey
         );
 
         return res.status(201).json({
             success: true,
-            message: "Payment order created successfully",
+            message: result.idempotent
+                ? "Existing payment order returned successfully"
+                : "Payment order created successfully",
             data: result,
         });
     } catch (error) {
@@ -24,6 +37,7 @@ const createPaymentOrder = async (req, res, next) => {
 const verifyPayment = async (req, res, next) => {
     try {
         const userId = req.user.id;
+
         const {
             razorpayOrderId,
             razorpayPaymentId,
@@ -72,16 +86,29 @@ const createRefund = async (req, res, next) => {
         const paymentId = Number(req.params.paymentId);
         const { amount, reason } = req.body;
 
+        const idempotencyKey = req.get("Idempotency-Key");
+
+        if (!idempotencyKey) {
+            return res.status(400).json({
+                success: false,
+                message: "Idempotency-Key header is required",
+                code: "IDEMPOTENCY_KEY_REQUIRED",
+            });
+        }
+
         const result = await paymentService.createRefund(
             userId,
             paymentId,
             amount,
-            reason
+            reason,
+            idempotencyKey
         );
 
         return res.status(201).json({
             success: true,
-            message: "Refund created successfully",
+            message: result.idempotent
+                ? "Existing refund returned successfully"
+                : "Refund created successfully",
             data: result,
         });
     } catch (error) {
@@ -112,7 +139,59 @@ const reconcilePayment = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: "Payment reconciliation completed successfully",
+            message:
+                "Payment reconciliation completed successfully",
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getRevenueAnalytics = async (req, res, next) => {
+    try {
+        const analytics =
+            await paymentService.getRevenueAnalytics();
+
+        return res.status(200).json({
+            success: true,
+            message: "Revenue analytics retrieved successfully",
+            data: analytics,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/*
+ * Razorpay Webhook
+ *
+ * Razorpay sends:
+ *   X-Razorpay-Signature
+ *
+ * The service verifies the signature using the raw
+ * request body and RAZORPAY_WEBHOOK_SECRET.
+ */
+const handleWebhook = async (req, res, next) => {
+    try {
+        const signature = req.get("X-Razorpay-Signature");
+
+        if (!signature) {
+            return res.status(400).json({
+                success: false,
+                message: "Razorpay webhook signature is required",
+                code: "WEBHOOK_SIGNATURE_REQUIRED",
+            });
+        }
+
+        const result = await paymentService.handleWebhook(
+            req.body,
+            signature
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Razorpay webhook processed successfully",
             data: result,
         });
     } catch (error) {
@@ -126,4 +205,6 @@ module.exports = {
     getPaymentReceipt,
     createRefund,
     reconcilePayment,
+    handleWebhook,
+    getRevenueAnalytics,
 };

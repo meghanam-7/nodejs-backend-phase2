@@ -9,7 +9,6 @@ const swaggerSpec = require("./docs/swagger");
 
 const { apiRateLimiter } = require("./middleware/rateLimiter");
 
-
 const app = express();
 
 if (process.env.NODE_ENV === "production") {
@@ -18,8 +17,24 @@ if (process.env.NODE_ENV === "production") {
 
 // Middleware
 app.use(timeout("10s"));
+
+/*
+ * Razorpay webhook requires the original raw request body
+ * for HMAC signature verification.
+ *
+ * This MUST run before express.json().
+ */
+app.use(
+    "/api/payments/webhook",
+    express.raw({
+        type: "application/json",
+        limit: "1mb",
+    })
+);
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
+
 app.use(helmet());
 
 // Enforce HTTPS in production
@@ -60,7 +75,6 @@ const discoveryRoutes = require("./routes/discoveryRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
-
 // Public routes
 app.use("/", healthRoutes);
 app.use("/", sampleRoutes);
@@ -68,13 +82,14 @@ app.use("/", authRoutes);
 app.use("/", companyRoutes);
 app.use("/", discoveryRoutes);
 
+// Swagger API documentation
 app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec)
 );
 
-// Apply API rate limiter only to /api routes
+// Apply API rate limiter to all /api routes
 app.use("/api", apiRateLimiter);
 
 // Protected/API routes
@@ -82,9 +97,23 @@ app.use("/", mockRoutes);
 app.use("/", workerRoutes);
 app.use("/", jobRoutes);
 app.use("/", applicationRoutes);
-app.use("/", paymentRoutes);
 app.use("/", cacheMetricsRoutes);
 
+// Payment routes
+// paymentRoutes already defines:
+// /payments/orders
+// /payments/verify
+// /payments/:paymentId/receipt
+// /payments/:paymentId/refund
+// /payments/:paymentId/reconcile
+//
+// Mounting under /api makes the final endpoints:
+// /api/payments/orders
+// /api/payments/verify
+// /api/payments/:paymentId/receipt
+// /api/payments/:paymentId/refund
+// /api/payments/:paymentId/reconcile
+app.use("/api", paymentRoutes);
 
 // Global production-safe error handler
 app.use((err, req, res, next) => {
@@ -108,3 +137,4 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+

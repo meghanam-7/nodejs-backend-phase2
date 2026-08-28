@@ -99,8 +99,8 @@ model Job {
   company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
   assessments    JobAssessment?
   thresholds     JobSkillThreshold[]
-  applications Application[]
-  payments     Payment[]
+  applications   Application[]
+  payments       Payment[]
 
   @@index([companyId])
   @@index([status])
@@ -161,22 +161,23 @@ model Application {
 }
 
 model Payment {
-  id                Int               @id @default(autoincrement())
+  id                Int      @id @default(autoincrement())
   userId            Int
   jobId             Int
   amount            Int
-  currency          String            @default("INR")
-  status            String            @default("CREATED")
-  razorpayOrderId   String            @unique
+  currency          String   @default("INR")
+  status            String   @default("CREATED")
+  razorpayOrderId   String   @unique
   razorpayPaymentId String?
   receipt           String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  idempotencyKey    String?  @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job              Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  refunds          Refund[]
-  reconciliations  Reconciliation[]
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job             Job              @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  refunds         Refund[]
+  reconciliations Reconciliation[]
 
   @@index([userId])
   @@index([jobId])
@@ -184,15 +185,16 @@ model Payment {
 }
 
 model Refund {
-  id                Int      @id @default(autoincrement())
-  paymentId         Int
-  amount            Int
-  currency          String   @default("INR")
-  status            String   @default("CREATED")
-  razorpayRefundId  String?  @unique
-  reason            String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  paymentId        Int
+  amount           Int
+  currency         String   @default("INR")
+  status           String   @default("CREATED")
+  razorpayRefundId String?  @unique
+  idempotencyKey   String?  @unique
+  reason           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
@@ -201,15 +203,15 @@ model Refund {
 }
 
 model Reconciliation {
-  id                  Int      @id @default(autoincrement())
-  paymentId           Int
+  id                   Int      @id @default(autoincrement())
+  paymentId            Int
   status               String
-  localAmount         Int
-  gatewayAmount       Int?
-  localPaymentStatus  String
+  localAmount          Int
+  gatewayAmount        Int?
+  localPaymentStatus   String
   gatewayPaymentStatus String?
-  mismatchReason      String?
-  reconciledAt        DateTime @default(now())
+  mismatchReason       String?
+  reconciledAt         DateTime @default(now())
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
