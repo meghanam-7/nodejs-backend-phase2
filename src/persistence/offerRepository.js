@@ -69,6 +69,7 @@ const createOffer = async (data) => {
       eSignProvider: data.eSignProvider,
       eSignStatus: data.eSignStatus,
       eSignRequestId: data.eSignRequestId,
+      signedHash: data.signedHash,
     },
   });
 };

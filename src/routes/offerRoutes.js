@@ -29,6 +29,35 @@ router.post(
   offerController.generateOffer
 );
 
+// Company requests e-Signature for an offer
+router.post(
+  "/offers/:id/esign",
+  authenticateToken,
+  requireRole("COMPANY"),
+  offerIdValidation,
+  validateRequest,
+  offerController.requestOfferESign
+);
+
+// Student signs an offer
+router.post(
+  "/offers/:id/sign",
+  authenticateToken,
+  requireRole("STUDENT"),
+  offerIdValidation,
+  validateRequest,
+  offerController.signOffer
+);
+
+// Student or company verifies the offer tamper hash
+router.get(
+  "/offers/:id/verify",
+  authenticateToken,
+  offerIdValidation,
+  validateRequest,
+  offerController.verifyOfferHash
+);
+
 // Student views their offers
 router.get(
   "/offers",
@@ -53,5 +82,7 @@ router.get(
   requireRole("COMPANY"),
   offerController.getJobOffers
 );
+
+
 
 module.exports = router;

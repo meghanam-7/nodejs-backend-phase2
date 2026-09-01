@@ -1,4 +1,7 @@
+const crypto = require("crypto");
+
 const offerRepository = require("../persistence/offerRepository");
+const esignService = require("./esignService");
 
 const generateOffer = async (
   companyUserId,
@@ -80,6 +83,7 @@ const generateOffer = async (
     eSignProvider: null,
     eSignStatus: "NOT_STARTED",
     eSignRequestId: null,
+    signedHash: null,
   });
 };
 
@@ -148,11 +152,235 @@ const getJobOffers = async (
   return offerRepository.findOffersByJobId(jobId);
 };
 
+/*
+ * Request e-Signature for an offer
+ */
+const requestOfferESign = async (
+  companyUserId,
+  offerId,
+  documentUrl
+) => {
+  // 1. Find the offer
+  const offer =
+    await offerRepository.findOfferById(offerId);
 
+  if (!offer) {
+    throw new Error("Offer not found");
+  }
+
+  // 2. Verify that the authenticated company owns the offer's job
+  const company =
+    await offerRepository.findCompanyByOwner(
+      companyUserId
+    );
+
+  if (!company) {
+    throw new Error(
+      "Company profile not found for this user"
+    );
+  }
+
+  if (
+    offer.application?.job?.companyId !==
+    company.id
+  ) {
+    throw new Error(
+      "You are not authorized to request e-Sign for this offer"
+    );
+  }
+
+  // 3. Only draft offers can enter the e-Sign workflow
+  if (offer.status !== "DRAFT") {
+    throw new Error(
+      "Only draft offers can be sent for e-Sign"
+    );
+  }
+
+  // 4. Prevent duplicate e-Sign requests
+  if (
+    offer.eSignStatus &&
+    offer.eSignStatus !== "NOT_STARTED"
+  ) {
+    throw new Error(
+      "An e-Sign request has already been created for this offer"
+    );
+  }
+
+  // 5. Create the e-Sign request through the provider service
+  const eSignRequest =
+    await esignService.createESignRequest({
+      offerId,
+      documentUrl,
+    });
+
+  // 6. Persist the e-Sign request details
+  return offerRepository.updateOffer(
+    offerId,
+    {
+      documentUrl: eSignRequest.documentUrl,
+      eSignProvider:
+        eSignRequest.eSignProvider,
+      eSignRequestId:
+        eSignRequest.eSignRequestId,
+      eSignStatus:
+        eSignRequest.eSignStatus,
+    }
+  );
+};
+
+/*
+ * Complete the e-Sign workflow and create
+ * a tamper-evident SHA-256 hash.
+ */
+const signOffer = async (
+  studentId,
+  offerId
+) => {
+  // 1. Find the offer
+  const offer =
+    await offerRepository.findOfferById(offerId);
+
+  if (!offer) {
+    throw new Error("Offer not found");
+  }
+
+  // 2. Verify that the authenticated student owns the offer
+  if (offer.studentId !== studentId) {
+    throw new Error(
+      "You are not authorized to sign this offer"
+    );
+  }
+
+  // 3. The offer must have an active e-Sign request
+  if (offer.eSignStatus !== "REQUESTED") {
+    throw new Error(
+      "Offer is not ready for signing"
+    );
+  }
+
+  // 4. Prevent signing the same offer twice
+  if (offer.status === "SIGNED") {
+    throw new Error(
+      "Offer has already been signed"
+    );
+  }
+
+  /*
+   * Build a deterministic representation of the
+   * offer's important business data.
+   *
+   * The same values must always produce the
+   * same SHA-256 hash.
+   */
+  const hashPayload = JSON.stringify({
+    id: offer.id,
+    applicationId: offer.applicationId,
+    studentId: offer.studentId,
+    jobId: offer.jobId,
+    compensation: offer.compensation,
+    currency: offer.currency,
+    joiningDate: offer.joiningDate
+      ? offer.joiningDate.toISOString()
+      : null,
+    documentUrl: offer.documentUrl,
+  });
+
+  // 5. Generate SHA-256 tamper-evident hash
+  const signedHash = crypto
+    .createHash("sha256")
+    .update(hashPayload)
+    .digest("hex");
+
+  // 6. Persist signed state and hash
+  return offerRepository.updateOffer(
+    offerId,
+    {
+      status: "SIGNED",
+      eSignStatus: "SIGNED",
+      signedAt: new Date(),
+      signedHash,
+    }
+  );
+};
+
+/*
+ * Verify the tamper-evident hash of a signed offer.
+ */
+const verifyOfferHash = async (
+  userId,
+  offerId
+) => {
+  // 1. Find the offer
+  const offer =
+    await offerRepository.findOfferById(offerId);
+
+  if (!offer) {
+    throw new Error("Offer not found");
+  }
+
+  // 2. Verify ownership
+  const company =
+    await offerRepository.findCompanyByOwner(
+      userId
+    );
+
+  const isStudent =
+    offer.studentId === userId;
+
+  const isCompanyOwner =
+    offer.application?.job?.companyId ===
+    company?.id;
+
+  if (!isStudent && !isCompanyOwner) {
+    throw new Error(
+      "You are not authorized to verify this offer"
+    );
+  }
+
+  // 3. A hash must exist before verification
+  if (!offer.signedHash) {
+    throw new Error(
+      "Offer has not been signed or hashed"
+    );
+  }
+
+  // 4. Recreate the exact hash payload
+  const hashPayload = JSON.stringify({
+    id: offer.id,
+    applicationId: offer.applicationId,
+    studentId: offer.studentId,
+    jobId: offer.jobId,
+    compensation: offer.compensation,
+    currency: offer.currency,
+    joiningDate: offer.joiningDate
+      ? offer.joiningDate.toISOString()
+      : null,
+    documentUrl: offer.documentUrl,
+  });
+
+  const calculatedHash = crypto
+    .createHash("sha256")
+    .update(hashPayload)
+    .digest("hex");
+
+  // 5. Compare stored and calculated hashes
+  const isValid =
+    calculatedHash === offer.signedHash;
+
+  return {
+    offerId: offer.id,
+    storedHash: offer.signedHash,
+    calculatedHash,
+    valid: isValid,
+  };
+};
 
 module.exports = {
   generateOffer,
   getOfferById,
   getStudentOffers,
   getJobOffers,
+  requestOfferESign,
+  signOffer,
+  verifyOfferHash,
 };

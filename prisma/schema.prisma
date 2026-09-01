@@ -183,6 +183,9 @@ model Offer {
   eSignRequestId String?
   signedAt       DateTime?
 
+  // Tamper-evident hash of the signed offer
+  signedHash String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

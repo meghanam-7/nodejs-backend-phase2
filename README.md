@@ -418,6 +418,52 @@ The implementation includes:
 
 **Task 11 Status: ✅ COMPLETED**
 
+### Phase 2 · Day 12
+
+**Task 12 – E-Sign Integration & Tamper-Evident Offer Verification**
+
+The objective of Day 12 was to extend the offer workflow with a mock e-signature integration and introduce tamper-evident verification for signed offers using cryptographic hashing.
+
+The implementation includes:
+
+- Mock e-signature provider service implementation
+- e-Sign request creation for offers
+- Unique e-Sign request ID generation using UUID
+- E-sign provider tracking using `MOCK_ESIGN`
+- E-sign lifecycle state tracking
+- E-sign request status transition from `NOT_STARTED` to `REQUESTED`
+- Offer document URL persistence during e-Sign request creation
+- Company ownership validation during e-Sign request creation
+- Prevention of unauthorized companies requesting e-Sign
+- Validation that the offer exists
+- Validation that only `DRAFT` offers can enter the e-Sign workflow
+- Prevention of duplicate e-Sign requests
+- Student offer signing workflow implementation
+- Signed offer status transition to `SIGNED`
+- E-sign status transition to `SIGNED`
+- Signed timestamp persistence using `signedAt`
+- Tamper-evident offer hash generation using SHA-256
+- Signed offer hash persistence using `signedHash`
+- Deterministic hash generation from signed offer data
+- Offer hash verification workflow
+- Comparison of stored hash against recalculated hash
+- Detection of modified signed offer data
+- Successful verification when signed offer data remains unchanged
+- Failed verification when signed offer data is tampered with
+- Restoration and re-verification of the original signed offer
+- Offer integrity verification through the service layer
+- Company and student authorization checks for offer operations
+- Controller and route integration for e-Sign and verification workflows
+- Prisma schema update for the `signedHash` field
+- Prisma migration for Task 12 changes
+- PostgreSQL persistence verification
+- Prisma Client regeneration
+- End-to-end e-Sign, signing, hashing, and verification testing through Postman
+- Existing automated test suite verification with all 33 tests passing
+- Controller and route module loading verification
+
+**Task 12 Status: ✅ COMPLETED**
+
 ---
 
 
@@ -445,6 +491,8 @@ The implementation includes:
 - Rate limiting
 - Helmet
 - CORS
+- Cryptographic hashing
+- SHA-256 tamper-evident verification
 
 ### Search & Discovery
 
@@ -479,7 +527,7 @@ The implementation includes:
 - Marketplace edge-case validation
 - PostgreSQL persistence verification
 
-### Offer Generation & E-Sign Design
+### Offer Generation & E-Sign Integration
 
 - Prisma-based offer management
 - Offer generation for shortlisted candidates
@@ -491,21 +539,37 @@ The implementation includes:
 - Joining date support
 - Offer lifecycle status tracking
 - Offer document URL support
+- Mock e-signature provider integration
+- E-sign request creation
+- Unique e-sign request ID generation
 - E-sign provider tracking
 - E-sign status tracking
 - E-sign request ID tracking
 - Signed timestamp tracking
+- Signed offer status transition
 - Company ownership authorization
 - Shortlisted-candidate validation
 - Duplicate offer prevention
+- Duplicate e-sign request prevention
 - Compensation validation
+- Draft-offer e-sign workflow validation
 - Student offer retrieval
 - Specific offer retrieval
 - Company job-offer retrieval
 - `DRAFT` offer status
 - `NOT_STARTED` e-sign status
-- Future e-sign integration readiness
-- PostgreSQL offer persistence
+- `REQUESTED` e-sign status
+- `SIGNED` offer status
+- `SIGNED` e-sign status
+- `signedAt` persistence
+- SHA-256 signed offer hashing
+- Tamper-evident `signedHash` persistence
+- Deterministic signed offer hash generation
+- Offer hash verification
+- Stored-hash versus calculated-hash comparison
+- Signed offer tamper detection
+- Cryptographic integrity verification
+- PostgreSQL offer and signature metadata persistence
 
 ### Payment Integration
 
@@ -592,6 +656,12 @@ The implementation includes:
 - Company job-offer retrieval testing
 - Offer authorization testing
 - Shortlisted-candidate offer validation testing
+- E-sign request testing
+- E-sign signing workflow testing
+- Signed offer hash generation testing
+- Offer hash verification testing
+- Offer tamper detection testing
+- Signed offer integrity restoration testing
 
 ### Documentation
 
@@ -602,6 +672,8 @@ The implementation includes:
 - Git
 - GitHub
 - npm
+
+---
 
 # 📁 Project Structure
 
@@ -624,7 +696,9 @@ p2task-node-server/
 │   │   │   └── migration.sql
 │   │   ├── 20260827134634_task10_payment_idempotency/
 │   │   │   └── migration.sql
-│   │   └── 20260828105957_task11_offer/
+│   │   ├── 20260828105957_task11_offer/
+│   │   |   └── migration.sql
+|   |   └── 20260829134025_task12_esign_tamper_hash/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -674,6 +748,7 @@ p2task-node-server/
 │   ├── services/
 │   │   ├── authService.js
 │   │   ├── companyService.js
+|   |   ├── esignService.js
 │   │   ├── jobService.js
 │   │   ├── assessmentService.js
 │   │   ├── thresholdRulesEngine.js
@@ -735,9 +810,12 @@ p2task-node-server/
 | `GET` | `/jobs/:id/applications` | JWT + COMPANY role | Returns applications submitted for a specific company job |
 | `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job |
 | `POST` | `/offers` | JWT + COMPANY role | Generates an offer for a shortlisted candidate |
+| `POST` | `/offers/:id/esign` | JWT + COMPANY role | Sends an offer document for e-Signature and creates the e-Sign request |
 | `GET` | `/offers` | JWT + STUDENT role | Returns all offers belonging to the authenticated student |
 | `GET` | `/offers/:id` | JWT | Returns a specific offer for an authorized student or company |
 | `GET` | `/jobs/:jobId/offers` | JWT + COMPANY role | Returns all offers generated for a company-owned job |
+| `POST` | `/offers/:id/sign` | JWT + STUDENT role | Signs an e-Sign requested offer and generates a tamper-evident SHA-256 hash |
+| `GET` | `/offers/:id/verify` | JWT | Verifies the offer's stored hash against a newly calculated hash to detect document tampering |
 | `POST` | `/payments/orders` | JWT | Creates a Razorpay payment order for a specific job and stores the payment record |
 | `POST` | `/payments/verify` | JWT | Verifies a Razorpay payment and updates the payment status to `CAPTURED` |
 | `GET` | `/payments` | JWT + STUDENT role | Returns payment records belonging to the authenticated student |
@@ -1195,6 +1273,65 @@ Determine Eligibility
 - Offer controller module loading verified
 - Offer routes module loading verified
 - Offer validation module loading verified
+- Existing automated test suite verified with **33/33 tests passing**
+
+---
+
+## Phase 2 · Day 12
+
+### Task 12: E-Signature Integration & Tamper-Evident Offer Verification (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- E-signature workflow implemented for offers
+- Mock e-sign provider service implemented
+- E-sign request generation implemented
+- Unique e-sign request ID generation using `crypto.randomUUID()`
+- E-sign provider tracking implemented using `MOCK_ESIGN`
+- E-sign request status tracking implemented
+- Offer document URL persistence implemented
+- Company ownership validation implemented before requesting e-Sign
+- Unauthorized companies prevented from requesting e-Sign
+- Draft-offer validation implemented before initiating e-Sign
+- Duplicate e-sign request prevention implemented
+- Required offer ID validation implemented
+- Required document URL validation implemented
+- E-sign request details persisted to the Offer record
+- Offer signing workflow implemented
+- Signed offer status transition implemented
+- `DRAFT` → `SIGNED` offer lifecycle transition implemented
+- `REQUESTED` → `SIGNED` e-sign status transition implemented
+- Signed timestamp persistence implemented using `signedAt`
+- Tamper-evident signed offer hash implemented using SHA-256
+- `signedHash` field added to the Offer data model
+- SHA-256 hash generated when an offer is signed
+- Signed offer hash persisted in PostgreSQL
+- Offer hash verification workflow implemented
+- Stored hash compared against a newly calculated hash
+- Valid signature verification response implemented
+- Tampered-document detection implemented
+- Invalid hash verification response implemented when document content changes
+- Hash verification exposes both stored and calculated hashes
+- Successful hash verification tested through Postman
+- Tampered hash verification tested through Postman
+- E-sign request successfully tested through Postman
+- Offer signing successfully tested through Postman
+- Signed offer persisted successfully with `SIGNED` status
+- Signed timestamp verified successfully
+- Signed hash persistence verified successfully
+- Matching stored and calculated hashes verified successfully
+- Hash mismatch scenario verified successfully with `valid: false`
+- Final hash verification successfully restored to `valid: true`
+- Prisma schema updated for tamper-evident offer storage
+- Prisma migration created and applied successfully
+- Prisma Client regenerated successfully
+- Prisma migration status verified successfully
+- E-sign service module loading verified successfully
+- Offer service module loading verified successfully
+- Offer controller module loading verified successfully
+- Offer routes module loading verified successfully
 - Existing automated test suite verified with **33/33 tests passing**
 
 ---

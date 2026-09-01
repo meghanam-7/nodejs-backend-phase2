@@ -107,9 +107,102 @@ const getJobOffers = async (req, res) => {
   }
 };
 
+/*
+ * Request e-Signature for an offer
+ */
+const requestOfferESign = async (req, res) => {
+  try {
+    const companyUserId = req.user.id;
+    const offerId = Number(req.params.id);
+    const { documentUrl } = req.body;
+
+    const offer = await offerService.requestOfferESign(
+      companyUserId,
+      offerId,
+      documentUrl
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Offer sent for e-Sign successfully",
+      data: offer,
+    });
+  } catch (error) {
+    console.error("Request e-Sign error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/*
+ * Complete the e-Signature process for an offer
+ */
+const signOffer = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const offerId = Number(req.params.id);
+
+    const offer = await offerService.signOffer(
+      studentId,
+      offerId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Offer signed successfully",
+      data: offer,
+    });
+  } catch (error) {
+    console.error("Sign offer error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/*
+ * Verify the tamper-evident hash of a signed offer
+ */
+const verifyOfferHash = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const offerId = Number(req.params.id);
+
+    const result =
+      await offerService.verifyOfferHash(
+        userId,
+        offerId
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Offer hash verification completed",
+      data: result,
+    });
+  } catch (error) {
+    console.error(
+      "Verify offer hash error:",
+      error
+    );
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   generateOffer,
   getOfferById,
   getStudentOffers,
   getJobOffers,
+  requestOfferESign,
+  signOffer,
+  verifyOfferHash,
 };
