@@ -464,6 +464,74 @@ The implementation includes:
 
 **Task 12 Status: ✅ COMPLETED**
 
+### Phase 2 · Day 13
+
+**Task 13 – Interview Scheduling & Management**
+
+The objective of Day 13 was to implement the interview scheduling workflow, allowing companies to schedule interviews for shortlisted candidates while enabling students and companies to retrieve scheduled interview information securely.
+
+The implementation includes:
+
+- Interview data model implemented using Prisma
+- Interview database migration created and applied successfully
+- Unique application-to-interview relationship implemented
+- Prevention of multiple interviews for the same application
+- Application relationship implemented
+- Job relationship implemented
+- Student relationship implemented
+- Interview scheduled date and time support implemented
+- Interview duration support implemented
+- Interview status tracking implemented
+- Meeting URL support implemented
+- Interview notes support implemented
+- Interview creation workflow implemented
+- Application existence validation implemented
+- Shortlisted-candidate validation implemented
+- Company ownership validation implemented during interview scheduling
+- Unauthorized company interview scheduling prevented
+- Duplicate interview scheduling prevention implemented
+- Student interview retrieval implemented
+- Specific interview retrieval implemented
+- Company job-interview retrieval implemented
+- Student ownership validation implemented for interview access
+- Company ownership validation implemented for interview access
+- Student interview conflict detection implemented
+- Job interview conflict detection implemented
+- Cancelled interviews excluded from scheduling conflict checks
+- Interview update workflow implemented
+- Interview deletion workflow implemented
+- Request validation implemented using Express Validator
+- Role-based authorization implemented for interview APIs
+- Interview repository layer implemented
+- Interview service layer implemented
+- Interview controller layer implemented
+- Interview routes implemented
+- Interview routes registered in the main application
+- Prisma schema updated with the `Interview` model
+- Prisma relations added between `Interview`, `Application`, `Job`, and `User`
+- Unique constraint added to `Interview.applicationId`
+- Prisma migration for Task 13 changes created and applied successfully
+- PostgreSQL persistence verified successfully
+- Prisma Client regenerated successfully
+- Repository module loading verified
+- Service module loading verified
+- Controller module loading verified
+- Validation module loading verified
+- Route module loading verified
+- Main application module loading verified
+- Task 13 integration modules verified successfully
+- Prisma schema validation completed successfully
+- Prisma migration status verified successfully
+- Interview scheduling successfully tested through Postman
+- Student interview retrieval successfully tested through Postman
+- Specific interview retrieval successfully tested through Postman
+- Duplicate interview scheduling validation successfully tested
+- Company job-interview retrieval successfully tested through Postman
+- Unauthorized access handling verified
+- Existing automated test suite verified with **33/33 tests passing**
+
+**Task 13 Status: ✅ COMPLETED**
+
 ---
 
 
@@ -571,6 +639,37 @@ The implementation includes:
 - Cryptographic integrity verification
 - PostgreSQL offer and signature metadata persistence
 
+### Interview Scheduling & Management
+
+- Prisma-based interview management
+- Interview-to-application relationship
+- Interview-to-job relationship
+- Interview-to-student relationship
+- One-interview-per-application constraint
+- Interview scheduling workflow
+- Interview date and time tracking
+- Interview duration tracking
+- Interview status tracking
+- Meeting URL support
+- Interview notes support
+- Student interview retrieval
+- Specific interview retrieval
+- Company job-interview retrieval
+- Company ownership authorization
+- Student ownership authorization
+- Shortlisted-candidate validation
+- Duplicate interview prevention
+- Interview conflict detection
+- Student schedule conflict validation
+- Job schedule conflict validation
+- Cancelled-interview exclusion from conflict checks
+- `SCHEDULED` interview status
+- `CANCELLED` interview status
+- Interview update support
+- Interview deletion support
+- PostgreSQL interview persistence
+- Interview API integration with application and job workflows
+
 ### Payment Integration
 
 - Razorpay
@@ -662,6 +761,15 @@ The implementation includes:
 - Offer hash verification testing
 - Offer tamper detection testing
 - Signed offer integrity restoration testing
+- Interview scheduling testing
+- Student interview retrieval testing
+- Specific interview retrieval testing
+- Company job-interview retrieval testing
+- Interview authorization testing
+- Duplicate interview prevention testing
+- Interview conflict validation testing
+- Application-to-interview relationship testing
+- Interview status validation testing
 
 ### Documentation
 
@@ -697,8 +805,12 @@ p2task-node-server/
 │   │   ├── 20260827134634_task10_payment_idempotency/
 │   │   │   └── migration.sql
 │   │   ├── 20260828105957_task11_offer/
-│   │   |   └── migration.sql
-|   |   └── 20260829134025_task12_esign_tamper_hash/
+│   │   │   └── migration.sql
+│   │   ├── 20260829134025_task12_esign_tamper_hash/
+│   │   │   └── migration.sql
+│   │   ├── 20260901042742_task13_interview_scheduling/
+│   │   │   └── migration.sql
+│   │   └── 20260901050924_task13_interview_application_unique/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -716,7 +828,8 @@ p2task-node-server/
 │   │   ├── discoveryController.js
 │   │   ├── applicationController.js
 │   │   ├── paymentController.js
-│   │   └── offerController.js
+│   │   ├── offerController.js
+│   │   └── interviewController.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
@@ -734,7 +847,8 @@ p2task-node-server/
 │   │   ├── discoveryRepository.js
 │   │   ├── applicationRepository.js
 │   │   ├── paymentRepository.js
-│   │   └── offerRepository.js
+│   │   ├── offerRepository.js
+│   │   └── interviewRepository.js
 │   │
 │   ├── routes/
 │   │   ├── authRoutes.js
@@ -743,19 +857,21 @@ p2task-node-server/
 │   │   ├── discoveryRoutes.js
 │   │   ├── applicationRoutes.js
 │   │   ├── paymentRoutes.js
-│   │   └── offerRoutes.js
+│   │   ├── offerRoutes.js
+│   │   └── interviewRoutes.js
 │   │
 │   ├── services/
 │   │   ├── authService.js
 │   │   ├── companyService.js
-|   |   ├── esignService.js
+│   │   ├── esignService.js
 │   │   ├── jobService.js
 │   │   ├── assessmentService.js
 │   │   ├── thresholdRulesEngine.js
 │   │   ├── discoveryService.js
 │   │   ├── applicationService.js
 │   │   ├── paymentService.js
-│   │   └── offerService.js
+│   │   ├── offerService.js
+│   │   └── interviewService.js
 │   │
 │   ├── validations/
 │   │   ├── authValidation.js
@@ -764,7 +880,8 @@ p2task-node-server/
 │   │   ├── discoveryValidation.js
 │   │   ├── applicationValidation.js
 │   │   ├── paymentValidation.js
-│   │   └── offerValidation.js
+│   │   ├── offerValidation.js
+│   │   └── interviewValidation.js
 │   │
 │   ├── app.js
 │   └── server.js
@@ -824,8 +941,15 @@ p2task-node-server/
 | `POST` | `/payments/:paymentId/reconcile` | JWT | Compares the local payment record with Razorpay gateway data and stores the reconciliation result |
 | `POST` | `/payments/webhook` | Public + Razorpay Signature | Receives Razorpay webhook events, verifies the webhook signature, and updates local payment status for supported events |
 | `GET` | `/payments/analytics/revenue` | JWT + COMPANY role | Returns revenue analytics including total payments, captured payments, failed payments, gross revenue, refunds, and net revenue |
+| `POST` | `/interviews` | JWT + COMPANY role | Schedules an interview for a shortlisted candidate |
+| `GET` | `/interviews` | JWT + STUDENT role | Returns all interviews scheduled for the authenticated student |
+| `GET` | `/interviews/:id` | JWT | Returns a specific interview for an authorized student or company |
+| `GET` | `/jobs/:jobId/interviews` | JWT + COMPANY role | Returns all interviews scheduled for a company-owned job |
+| `PUT` | `/interviews/:id` | JWT | Updates an existing interview for an authorized user |
+| `DELETE` | `/interviews/:id` | JWT | Deletes an existing interview for an authorized user |
 
 ---
+
 
 # 📊 Current Status
 
@@ -1333,6 +1457,95 @@ Determine Eligibility
 - Offer controller module loading verified successfully
 - Offer routes module loading verified successfully
 - Existing automated test suite verified with **33/33 tests passing**
+
+---
+
+## Phase 2 · Day 13
+
+### Task 13: Interview Scheduling & Management (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- Interview scheduling workflow implemented
+- Prisma `Interview` model added to the database schema
+- Interview-to-application relationship implemented
+- Interview-to-job relationship implemented
+- Interview-to-student relationship implemented
+- Interview scheduled date and time persistence implemented using `scheduledAt`
+- Interview duration support implemented
+- Default interview duration configured as 60 minutes
+- Interview status tracking implemented
+- Default interview status configured as `SCHEDULED`
+- Optional meeting URL support implemented
+- Optional interview notes support implemented
+- Interview creation repository method implemented
+- Interview retrieval by ID implemented
+- Interview retrieval by application implemented
+- Interview retrieval by student implemented
+- Interview retrieval by job implemented
+- Student interview listing implemented
+- Company job interview listing implemented
+- Interview update functionality implemented
+- Interview deletion functionality implemented
+- Student interview conflict detection implemented
+- Job interview conflict detection implemented
+- Cancelled interviews excluded from active scheduling conflict checks
+- Application validation implemented before interview scheduling
+- Student validation implemented through application relationship
+- Job validation implemented through application relationship
+- Company ownership validation implemented for interview scheduling
+- Company ownership validation implemented for company interview retrieval
+- Student authorization implemented for student interview access
+- Duplicate interview prevention implemented
+- Database-level unique constraint added for `applicationId`
+- Prevention of multiple interviews for the same application implemented
+- Interview authorization checks implemented in the service layer
+- Interview validation middleware implemented
+- Required application ID validation implemented
+- Required scheduled time validation implemented
+- Interview duration validation implemented
+- Interview status validation implemented
+- Interview controller implemented
+- Interview service layer implemented
+- Interview repository layer implemented
+- Interview validation layer implemented
+- Interview routes implemented
+- Interview routes registered in the main Express application
+- `POST /interviews` scheduling endpoint implemented
+- `GET /interviews` student interview listing endpoint implemented
+- `GET /interviews/:id` interview retrieval endpoint implemented
+- `GET /jobs/:jobId/interviews` company job interview listing endpoint implemented
+- `PUT /interviews/:id` interview update endpoint implemented
+- `DELETE /interviews/:id` interview deletion endpoint implemented
+- Company JWT authorization verified for company-owned job interview access
+- Student JWT authorization verified for student interview access
+- Unauthorized access response verified with `Access denied.`
+- Duplicate interview scenario tested successfully through Postman
+- Successful interview scheduling tested through Postman
+- Student interview retrieval tested successfully through Postman
+- Specific interview retrieval tested successfully through Postman
+- Company job interview retrieval tested successfully through Postman
+- Interview response data verified successfully
+- Interview-to-application relationship verified successfully
+- Interview-to-job relationship verified successfully
+- Interview-to-student relationship verified successfully
+- Prisma schema formatted successfully
+- Prisma schema validation completed successfully
+- Interview scheduling migration created and applied successfully
+- Interview application unique constraint migration created and applied successfully
+- Prisma Client regenerated successfully
+- Prisma migration status verified successfully
+- Interview repository module loading verified successfully
+- Interview service module loading verified successfully
+- Interview controller module loading verified successfully
+- Interview validation module loading verified successfully
+- Interview routes module loading verified successfully
+- Main application module loading verified successfully
+- Full Task 13 integration module loading verified successfully
+- Existing automated test suite verified with **33/33 tests passing**
+- PostgreSQL database confirmed to be synchronized with all 13 migrations
 
 ---
 

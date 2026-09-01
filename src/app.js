@@ -75,6 +75,7 @@ const offerRoutes = require("./routes/offerRoutes");
 const discoveryRoutes = require("./routes/discoveryRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const interviewRoutes = require("./routes/interviewRoutes");
 
 // Public routes
 app.use("/", healthRoutes);
@@ -83,6 +84,7 @@ app.use("/", authRoutes);
 app.use("/", companyRoutes);
 app.use("/", offerRoutes);
 app.use("/", discoveryRoutes);
+app.use("/", interviewRoutes);
 
 // Swagger API documentation
 app.use(

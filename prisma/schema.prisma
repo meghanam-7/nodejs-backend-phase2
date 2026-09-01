@@ -20,6 +20,7 @@ model User {
   applications Application[]
   payments     Payment[]
   offers       Offer[]
+  interviews   Interview[]
 }
 
 model Product {
@@ -103,6 +104,7 @@ model Job {
   applications   Application[]
   payments       Payment[]
   offers         Offer[]
+  interviews     Interview[]
 
   @@index([companyId])
   @@index([status])
@@ -157,6 +159,8 @@ model Application {
   student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   offer Offer?
+
+  interviews Interview[]
 
   @@unique([jobId, studentId])
   @@index([jobId])
@@ -257,5 +261,33 @@ model Reconciliation {
   payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 
   @@index([paymentId])
+  @@index([status])
+}
+
+model Interview {
+  id            Int @id @default(autoincrement())
+  applicationId Int
+  jobId         Int
+  studentId     Int
+
+  scheduledAt DateTime
+  duration    Int      @default(60)
+
+  status String @default("SCHEDULED")
+
+  meetingUrl String?
+  notes      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  job         Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  student     User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId])
+  @@index([jobId])
+  @@index([studentId])
+  @@index([scheduledAt])
   @@index([status])
 }
