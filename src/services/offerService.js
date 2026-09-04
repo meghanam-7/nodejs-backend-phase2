@@ -2,6 +2,7 @@ const crypto = require("crypto");
 
 const offerRepository = require("../persistence/offerRepository");
 const esignService = require("./esignService");
+const applicationStatusService = require("./applicationStatusService");
 
 const generateOffer = async (
   companyUserId,
@@ -38,10 +39,11 @@ const generateOffer = async (
     );
   }
 
-  // 3. Only shortlisted candidates can receive offers
-  if (application.status !== "SHORTLISTED") {
+  // 3. Only candidates with an interview scheduled
+  // can receive an offer
+  if (application.status !== "INTERVIEW_SCHEDULED") {
     throw new Error(
-      "An offer can only be generated for a shortlisted candidate"
+      "An offer can only be generated for a candidate with a scheduled interview"
     );
   }
 
@@ -69,22 +71,34 @@ const generateOffer = async (
   }
 
   // 6. Create the offer
-  return offerRepository.createOffer({
+  const offer =
+    await offerRepository.createOffer({
+      applicationId,
+      studentId: application.student.id,
+      jobId: application.job.id,
+      compensation: Number(compensation),
+      currency,
+      joiningDate: joiningDate
+        ? new Date(joiningDate)
+        : null,
+      status: "DRAFT",
+      documentUrl: null,
+      eSignProvider: null,
+      eSignStatus: "NOT_STARTED",
+      eSignRequestId: null,
+      signedHash: null,
+    });
+
+  // 7. Update application status through
+  // the central Status Model
+  await applicationStatusService.updateApplicationStatus(
+    companyUserId,
     applicationId,
-    studentId: application.student.id,
-    jobId: application.job.id,
-    compensation: Number(compensation),
-    currency,
-    joiningDate: joiningDate
-      ? new Date(joiningDate)
-      : null,
-    status: "DRAFT",
-    documentUrl: null,
-    eSignProvider: null,
-    eSignStatus: "NOT_STARTED",
-    eSignRequestId: null,
-    signedHash: null,
-  });
+    "OFFERED"
+  );
+
+  // 8. Return the created offer
+  return offer;
 };
 
 const getOfferById = async (userId, offerId) => {
@@ -168,7 +182,8 @@ const requestOfferESign = async (
     throw new Error("Offer not found");
   }
 
-  // 2. Verify that the authenticated company owns the offer's job
+  // 2. Verify that the authenticated company owns
+  // the offer's job
   const company =
     await offerRepository.findCompanyByOwner(
       companyUserId
@@ -206,7 +221,8 @@ const requestOfferESign = async (
     );
   }
 
-  // 5. Create the e-Sign request through the provider service
+  // 5. Create the e-Sign request through
+  // the provider service
   const eSignRequest =
     await esignService.createESignRequest({
       offerId,
@@ -244,7 +260,8 @@ const signOffer = async (
     throw new Error("Offer not found");
   }
 
-  // 2. Verify that the authenticated student owns the offer
+  // 2. Verify that the authenticated student
+  // owns the offer
   if (offer.studentId !== studentId) {
     throw new Error(
       "You are not authorized to sign this offer"
@@ -268,9 +285,6 @@ const signOffer = async (
   /*
    * Build a deterministic representation of the
    * offer's important business data.
-   *
-   * The same values must always produce the
-   * same SHA-256 hash.
    */
   const hashPayload = JSON.stringify({
     id: offer.id,

@@ -162,6 +162,8 @@ model Application {
 
   interviews Interview[]
 
+  statusHistory ApplicationStatusHistory[]
+
   @@unique([jobId, studentId])
   @@index([jobId])
   @@index([studentId])
@@ -290,4 +292,17 @@ model Interview {
   @@index([studentId])
   @@index([scheduledAt])
   @@index([status])
+}
+
+model ApplicationStatusHistory {
+  id            Int      @id @default(autoincrement())
+  applicationId Int
+  status        String
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([status])
+  @@index([createdAt])
 }

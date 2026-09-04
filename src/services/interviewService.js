@@ -1,4 +1,5 @@
 const interviewRepository = require("../persistence/interviewRepository");
+const applicationStatusService = require("./applicationStatusService");
 
 const scheduleInterview = async ({
   companyUserId,
@@ -25,18 +26,13 @@ const scheduleInterview = async ({
 
   // 3. Prevent scheduling an interview in the past
   if (interviewDate <= new Date()) {
-    throw new Error(
-      "Interview cannot be scheduled in the past"
-    );
+    throw new Error("Interview cannot be scheduled in the past");
   }
 
   // 4. Validate duration
   const duration = Number(durationMinutes);
 
-  if (
-    !Number.isInteger(duration) ||
-    duration <= 0
-  ) {
+  if (!Number.isInteger(duration) || duration <= 0) {
     throw new Error(
       "Interview duration must be a positive integer"
     );
@@ -102,17 +98,28 @@ const scheduleInterview = async ({
   }
 
   // 10. Create the interview
-  return interviewRepository.createInterview({
+  const interview =
+    await interviewRepository.createInterview({
+      applicationId,
+      studentId: application.student.id,
+      jobId: application.job.id,
+      scheduledAt: interviewDate,
+      duration,
+      meetingUrl: meetingUrl
+        ? meetingUrl.trim()
+        : null,
+      status: "SCHEDULED",
+    });
+
+  // 11. Update application status through the Status Model
+  await applicationStatusService.updateApplicationStatus(
+    companyUserId,
     applicationId,
-    studentId: application.student.id,
-    jobId: application.job.id,
-    scheduledAt: interviewDate,
-    durationMinutes: duration,
-    meetingUrl: meetingUrl
-      ? meetingUrl.trim()
-      : null,
-    status: "SCHEDULED",
-  });
+    "INTERVIEW_SCHEDULED"
+  );
+
+  // 12. Return the created interview
+  return interview;
 };
 
 const getInterviewById = async (

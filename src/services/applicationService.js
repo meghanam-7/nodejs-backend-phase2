@@ -1,5 +1,6 @@
 const applicationRepository = require("../persistence/applicationRepository");
 const paymentRepository = require("../persistence/paymentRepository");
+const applicationStatusService = require("./applicationStatusService");
 
 const applyToJob = async (studentId, jobId) => {
   const job = await applicationRepository.findJobById(jobId);
@@ -78,36 +79,10 @@ const shortlistApplication = async (
   companyUserId,
   applicationId
 ) => {
-  const company =
-    await applicationRepository.findCompanyByOwner(
-      companyUserId
-    );
-
-  if (!company) {
-    throw new Error("Company profile not found for this user");
-  }
-
-  const application =
-    await applicationRepository.findJobApplication(
-      applicationId
-    );
-
-  if (!application) {
-    throw new Error("Application not found");
-  }
-
-  if (application.job.companyId !== company.id) {
-    throw new Error(
-      "You are not authorized to shortlist this application"
-    );
-  }
-
-  if (application.status === "SHORTLISTED") {
-    throw new Error("Application is already shortlisted");
-  }
-
-  return applicationRepository.shortlistApplication(
-    applicationId
+  return applicationStatusService.updateApplicationStatus(
+    companyUserId,
+    applicationId,
+    "SHORTLISTED"
   );
 };
 

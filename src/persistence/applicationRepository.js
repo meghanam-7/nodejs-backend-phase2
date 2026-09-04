@@ -165,6 +165,36 @@ const shortlistApplication = async (applicationId) => {
   });
 };
 
+const updateApplicationStatus = async (
+  applicationId,
+  status
+) => {
+  return prisma.application.update({
+    where: {
+      id: applicationId,
+    },
+    data: {
+      status,
+    },
+    include: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      job: {
+        select: {
+          id: true,
+          title: true,
+          companyId: true,
+        },
+      },
+    },
+  });
+};
+
 module.exports = {
   findJobById,
   findApplication,
@@ -174,4 +204,5 @@ module.exports = {
   findJobApplication,
   findCompanyApplications,
   shortlistApplication,
+  updateApplicationStatus 
 };

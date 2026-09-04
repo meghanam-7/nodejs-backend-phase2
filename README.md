@@ -534,6 +534,91 @@ The implementation includes:
 
 ---
 
+### Phase 2 · Day 14
+
+**Task 14 – End-to-End Status Tracking & Parsing**
+
+The objective of Day 14 was to implement and integrate a centralized application status tracking workflow, connecting the complete application-to-offer journey while ensuring status history is persisted and offer authenticity can be verified securely.
+
+The implementation includes:
+
+- Centralized application status model implemented
+- Application status history data model implemented using Prisma
+- Application status history database migration created and applied successfully
+- PostgreSQL persistence implemented for application status history
+- Application status transition rules implemented
+- Supported application statuses implemented
+- `APPLIED` status supported
+- `SHORTLISTED` status supported
+- `INTERVIEW_SCHEDULED` status supported
+- `OFFERED` status supported
+- `ACCEPTED` status supported
+- `REJECTED` status supported
+- `WITHDRAWN` status supported
+- Valid status transition validation implemented
+- Invalid status validation implemented
+- Invalid status transition prevention implemented
+- Application status update workflow implemented
+- Application status history retrieval implemented
+- Latest application status retrieval implemented
+- Company ownership validation implemented for status updates
+- Job ownership validation implemented for status updates
+- Application-to-status-history relationship implemented
+- Application status history indexes implemented
+- Application → `SHORTLISTED` integration implemented
+- Application → `INTERVIEW_SCHEDULED` integration implemented
+- Interview scheduling integrated with the centralized Status Model
+- Application → `OFFERED` integration implemented
+- Offer generation integrated with the centralized Status Model
+- Complete application-to-offer status flow implemented
+- Offer generation restricted to candidates with scheduled interviews
+- Duplicate offer generation prevention implemented
+- Offer e-Sign workflow verified successfully
+- Mock e-Sign provider integration verified
+- Offer signing workflow verified successfully
+- SHA-256 tamper-evident offer hash generation implemented
+- Signed offer hash persistence verified successfully
+- Offer hash verification workflow implemented
+- Stored and calculated offer hashes independently verified
+- Offer authenticity verification returned `valid: true`
+- Request validation implemented using Express Validator
+- Role-based authorization implemented for status and offer workflows
+- Application status history repository layer implemented
+- Application status service layer implemented
+- Application status controller layer implemented
+- Application status routes implemented
+- Application status routes registered in the main application
+- Interview service integrated with the centralized Status Model
+- Offer service integrated with the centralized Status Model
+- Prisma schema updated with `ApplicationStatusHistory`
+- Prisma relations added between `ApplicationStatusHistory` and `Application`
+- Prisma migration for Task 14 changes created and applied successfully
+- PostgreSQL persistence verified successfully
+- Prisma Client regenerated successfully
+- Prisma schema validation completed successfully
+- Prisma migration status verified successfully
+- Repository module loading verified
+- Service module loading verified
+- Controller module loading verified
+- Route module loading verified
+- Main application module loading verified
+- Invalid status handling successfully tested
+- Invalid status transition handling successfully tested
+- Duplicate status transition prevention successfully tested
+- Application → Shortlisted workflow successfully tested through Postman
+- Interview scheduling and status transition successfully tested through Postman
+- Offer generation and status transition successfully tested through Postman
+- Offer e-Sign request successfully tested through Postman
+- Offer signing successfully tested through Postman
+- Offer hash verification successfully tested through Postman
+- End-to-end application → offer workflow verified successfully
+- Status history persistence verified successfully in PostgreSQL
+- Signed offer authenticity verified successfully
+
+**Task 14 Status: ✅ COMPLETED**
+
+---
+
 
 # 🛠️ Tech Stack
 
@@ -595,10 +680,38 @@ The implementation includes:
 - Marketplace edge-case validation
 - PostgreSQL persistence verification
 
+### Application Status Tracking
+
+- Centralized application status model
+- Application status history management
+- Prisma-based status history persistence
+- Application-to-status-history relationship
+- Valid status transition rules
+- Invalid status validation
+- Invalid transition prevention
+- Application status update workflow
+- Status history retrieval
+- Latest status retrieval
+- Company ownership authorization
+- Job ownership authorization
+- Status history indexing
+- `APPLIED` status
+- `SHORTLISTED` status
+- `INTERVIEW_SCHEDULED` status
+- `OFFERED` status
+- `ACCEPTED` status
+- `REJECTED` status
+- `WITHDRAWN` status
+- Application → Shortlisted integration
+- Application → Interview Scheduled integration
+- Application → Offered integration
+- End-to-end application-to-offer status tracking
+- PostgreSQL status history persistence
+
 ### Offer Generation & E-Sign Integration
 
 - Prisma-based offer management
-- Offer generation for shortlisted candidates
+- Offer generation for candidates with scheduled interviews
 - Offer-to-application relationship
 - Offer-to-student relationship
 - Offer-to-job relationship
@@ -616,7 +729,7 @@ The implementation includes:
 - Signed timestamp tracking
 - Signed offer status transition
 - Company ownership authorization
-- Shortlisted-candidate validation
+- Interview-scheduled candidate validation
 - Duplicate offer prevention
 - Duplicate e-sign request prevention
 - Compensation validation
@@ -669,6 +782,8 @@ The implementation includes:
 - Interview deletion support
 - PostgreSQL interview persistence
 - Interview API integration with application and job workflows
+- Interview integration with centralized application status tracking
+- `INTERVIEW_SCHEDULED` application status transition
 
 ### Payment Integration
 
@@ -750,17 +865,23 @@ The implementation includes:
 - Payment captured webhook testing
 - Payment failed webhook testing
 - End-to-end payment and application testing
+- Application status transition testing
+- Application status history testing
+- Invalid status testing
+- Invalid status transition testing
+- Duplicate status transition testing
+- End-to-end application-to-offer status testing
 - Offer generation testing
 - Offer retrieval testing
 - Company job-offer retrieval testing
 - Offer authorization testing
-- Shortlisted-candidate offer validation testing
+- Interview-scheduled candidate offer validation testing
 - E-sign request testing
 - E-sign signing workflow testing
 - Signed offer hash generation testing
 - Offer hash verification testing
 - Offer tamper detection testing
-- Signed offer integrity restoration testing
+- Signed offer integrity verification testing
 - Interview scheduling testing
 - Student interview retrieval testing
 - Specific interview retrieval testing
@@ -770,6 +891,7 @@ The implementation includes:
 - Interview conflict validation testing
 - Application-to-interview relationship testing
 - Interview status validation testing
+- Status history PostgreSQL persistence verification
 
 ### Documentation
 
@@ -810,7 +932,9 @@ p2task-node-server/
 │   │   │   └── migration.sql
 │   │   ├── 20260901042742_task13_interview_scheduling/
 │   │   │   └── migration.sql
-│   │   └── 20260901050924_task13_interview_application_unique/
+│   │   ├── 20260901050924_task13_interview_application_unique/
+│   │   │   └── migration.sql
+│   │   └── 20260901061440_task14_application_status_history/
 │   │       └── migration.sql
 │   │
 │   ├── schema.prisma
@@ -827,6 +951,7 @@ p2task-node-server/
 │   │   ├── jobController.js
 │   │   ├── discoveryController.js
 │   │   ├── applicationController.js
+│   │   ├── applicationStatusController.js
 │   │   ├── paymentController.js
 │   │   ├── offerController.js
 │   │   └── interviewController.js
@@ -846,6 +971,7 @@ p2task-node-server/
 │   │   ├── jobRepository.js
 │   │   ├── discoveryRepository.js
 │   │   ├── applicationRepository.js
+│   │   ├── applicationStatusHistoryRepository.js
 │   │   ├── paymentRepository.js
 │   │   ├── offerRepository.js
 │   │   └── interviewRepository.js
@@ -856,6 +982,7 @@ p2task-node-server/
 │   │   ├── jobRoutes.js
 │   │   ├── discoveryRoutes.js
 │   │   ├── applicationRoutes.js
+│   │   ├── applicationStatusRoutes.js
 │   │   ├── paymentRoutes.js
 │   │   ├── offerRoutes.js
 │   │   └── interviewRoutes.js
@@ -869,6 +996,7 @@ p2task-node-server/
 │   │   ├── thresholdRulesEngine.js
 │   │   ├── discoveryService.js
 │   │   ├── applicationService.js
+│   │   ├── applicationStatusService.js
 │   │   ├── paymentService.js
 │   │   ├── offerService.js
 │   │   └── interviewService.js
@@ -925,8 +1053,11 @@ p2task-node-server/
 | `POST` | `/jobs/:id/applications` | JWT + STUDENT role | Allows a student to apply to a published job after successful payment |
 | `GET` | `/applications` | JWT + STUDENT role | Returns all applications submitted by the authenticated student |
 | `GET` | `/jobs/:id/applications` | JWT + COMPANY role | Returns applications submitted for a specific company job |
-| `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job |
-| `POST` | `/offers` | JWT + COMPANY role | Generates an offer for a shortlisted candidate |
+| `POST` | `/applications/:id/shortlist` | JWT + COMPANY role | Shortlists an applicant for a company-owned job and updates the application status to `SHORTLISTED` |
+| `PATCH` | `/applications/:id/status` | JWT + COMPANY role | Updates an application's status using the centralized Status Model |
+| `GET` | `/applications/:id/status-history` | JWT + COMPANY role | Returns the complete status history for an application |
+| `GET` | `/applications/:id/status-history/latest` | JWT + COMPANY role | Returns the latest status history record for an application |
+| `POST` | `/offers` | JWT + COMPANY role | Generates an offer for a candidate with a scheduled interview and updates the application status to `OFFERED` |
 | `POST` | `/offers/:id/esign` | JWT + COMPANY role | Sends an offer document for e-Signature and creates the e-Sign request |
 | `GET` | `/offers` | JWT + STUDENT role | Returns all offers belonging to the authenticated student |
 | `GET` | `/offers/:id` | JWT | Returns a specific offer for an authorized student or company |
@@ -941,7 +1072,7 @@ p2task-node-server/
 | `POST` | `/payments/:paymentId/reconcile` | JWT | Compares the local payment record with Razorpay gateway data and stores the reconciliation result |
 | `POST` | `/payments/webhook` | Public + Razorpay Signature | Receives Razorpay webhook events, verifies the webhook signature, and updates local payment status for supported events |
 | `GET` | `/payments/analytics/revenue` | JWT + COMPANY role | Returns revenue analytics including total payments, captured payments, failed payments, gross revenue, refunds, and net revenue |
-| `POST` | `/interviews` | JWT + COMPANY role | Schedules an interview for a shortlisted candidate |
+| `POST` | `/interviews` | JWT + COMPANY role | Schedules an interview for a shortlisted candidate and updates the application status to `INTERVIEW_SCHEDULED` |
 | `GET` | `/interviews` | JWT + STUDENT role | Returns all interviews scheduled for the authenticated student |
 | `GET` | `/interviews/:id` | JWT | Returns a specific interview for an authorized student or company |
 | `GET` | `/jobs/:jobId/interviews` | JWT + COMPANY role | Returns all interviews scheduled for a company-owned job |
@@ -949,7 +1080,6 @@ p2task-node-server/
 | `DELETE` | `/interviews/:id` | JWT | Deletes an existing interview for an authorized user |
 
 ---
-
 
 # 📊 Current Status
 
@@ -1546,6 +1676,94 @@ Determine Eligibility
 - Full Task 13 integration module loading verified successfully
 - Existing automated test suite verified with **33/33 tests passing**
 - PostgreSQL database confirmed to be synchronized with all 13 migrations
+
+---
+
+## Phase 2 · Day 14
+
+### Task 14: End-to-End Status Tracking & Parsing (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- Centralized application status tracking workflow implemented
+- Prisma `ApplicationStatusHistory` model added to the database schema
+- Application-to-status-history relationship implemented
+- Application status history persistence implemented using PostgreSQL
+- Application status transition rules implemented
+- Supported application statuses implemented
+- `APPLIED` status supported
+- `SHORTLISTED` status supported
+- `INTERVIEW_SCHEDULED` status supported
+- `OFFERED` status supported
+- `ACCEPTED` status supported
+- `REJECTED` status supported
+- `WITHDRAWN` status supported
+- Valid application status transition validation implemented
+- Invalid application status validation implemented
+- Invalid status transition prevention implemented
+- Duplicate status transition prevention implemented
+- Application status update service implemented
+- Application status history retrieval implemented
+- Latest application status retrieval implemented
+- Company ownership validation implemented for status updates
+- Job ownership validation implemented for status updates
+- Application status history repository layer implemented
+- Application status service layer implemented
+- Application status controller implemented
+- Application status routes implemented
+- Application status routes registered in the main Express application
+- `PATCH /applications/:id/status` endpoint implemented
+- `GET /applications/:id/status-history` endpoint implemented
+- `GET /applications/:id/status-history/latest` endpoint implemented
+- Application → `SHORTLISTED` integration implemented
+- Shortlisting workflow integrated with centralized status tracking
+- Application → `INTERVIEW_SCHEDULED` integration implemented
+- Interview scheduling workflow integrated with centralized status tracking
+- Application → `OFFERED` integration implemented
+- Offer generation workflow integrated with centralized status tracking
+- Offer generation restricted to candidates with scheduled interviews
+- Complete application → shortlist → interview → offer status flow implemented
+- Application status history persisted for each status transition
+- Status history indexes implemented for application ID, status, and creation time
+- Interview service integrated with the centralized Status Model
+- Offer service integrated with the centralized Status Model
+- Offer e-Sign workflow verified successfully
+- Mock e-Sign provider integration verified successfully
+- Offer signing workflow verified successfully
+- Signed offer hash generation implemented using SHA-256
+- Signed offer hash persistence verified successfully
+- Offer hash verification workflow implemented
+- Stored offer hash compared with independently calculated hash
+- Offer authenticity verification successfully returned `valid: true`
+- Request validation implemented using Express Validator
+- Role-based authorization verified for status and offer workflows
+- Prisma schema formatted successfully
+- Prisma schema validation completed successfully
+- Task 14 migration created and applied successfully
+- Prisma Client regenerated successfully
+- Prisma migration status verified successfully
+- Application status history repository module loading verified successfully
+- Application status service module loading verified successfully
+- Application status controller module loading verified successfully
+- Application status routes module loading verified successfully
+- Interview service integration module loading verified successfully
+- Offer service integration module loading verified successfully
+- Main application module loading verified successfully
+- Invalid application status scenario tested successfully
+- Invalid application status transition scenario tested successfully
+- Duplicate status transition scenario tested successfully
+- Application → Shortlisted workflow tested successfully through Postman
+- Interview scheduling → status transition tested successfully through Postman
+- Offer generation → status transition tested successfully through Postman
+- Offer e-Sign request tested successfully through Postman
+- Offer signing tested successfully through Postman
+- Signed offer hash verification tested successfully through Postman
+- End-to-end application → offer workflow verified successfully
+- Application status history persistence verified successfully in PostgreSQL
+- Signed offer authenticity and tamper-evident integrity verification completed successfully
+- PostgreSQL database confirmed to be synchronized with all 15 migrations
 
 ---
 
