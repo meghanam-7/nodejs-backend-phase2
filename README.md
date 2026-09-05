@@ -532,8 +532,6 @@ The implementation includes:
 
 **Task 13 Status: ✅ COMPLETED**
 
----
-
 ### Phase 2 · Day 14
 
 **Task 14 – End-to-End Status Tracking & Parsing**
@@ -616,6 +614,83 @@ The implementation includes:
 - Signed offer authenticity verified successfully
 
 **Task 14 Status: ✅ COMPLETED**
+
+### Phase 2 · Day 15
+
+**Task 15 – Trust Layer Integration & Dry Run**
+
+The objective of Day 15 was to stabilize and verify the trust layer by validating the complete application-to-offer journey, including e-Signature processing, signed offer persistence, and cryptographic offer authenticity verification using real persisted data.
+
+The implementation and verification includes:
+
+- Trust layer workflow reviewed and stabilized
+- End-to-end application-to-offer journey verified
+- Application workflow verified with real persisted data
+- Application → `APPLIED` status verified
+- Application → `SHORTLISTED` status verified
+- Shortlisted candidate → interview scheduling verified
+- Application → `INTERVIEW_SCHEDULED` status verified
+- Interview scheduling integrated with the centralized Status Model
+- Interview data persisted successfully in PostgreSQL
+- Interview-to-application relationship verified
+- Interview-to-job relationship verified
+- Interview-to-student relationship verified
+- Offer generation workflow verified
+- Offer generation restricted to candidates with scheduled interviews
+- Application → `OFFERED` status verified
+- Offer data persisted successfully in PostgreSQL
+- Offer-to-application relationship verified
+- Offer-to-student relationship verified
+- Offer-to-job relationship verified
+- Offer compensation and currency persistence verified
+- Joining date persistence verified
+- Mock e-Sign provider integration reviewed
+- e-Sign request workflow verified successfully
+- e-Sign request ID generation verified
+- e-Sign provider tracking verified
+- e-Sign status tracking verified
+- Offer document URL persistence verified
+- Student offer signing workflow verified successfully
+- Offer status transitioned to `SIGNED`
+- e-Sign status transitioned to `SIGNED`
+- Signed timestamp persisted successfully
+- SHA-256 signed offer hash generation verified
+- Signed offer hash persisted successfully
+- Deterministic offer hash generation verified
+- Offer hash verification workflow verified
+- Stored offer hash independently compared with calculated hash
+- Stored and calculated hashes matched successfully
+- Offer authenticity verification returned `valid: true`
+- Cryptographic offer integrity verification demonstrated
+- Existing application status transition validation reviewed
+- Invalid application status handling previously verified
+- Invalid application status transition handling previously verified
+- Duplicate status transition prevention previously verified
+- Payment idempotency implementation reviewed
+- Existing payment idempotency behavior observed through the API
+- Payment failure state handling reviewed
+- Razorpay payment workflow and failure-handling implementation reviewed
+- Razorpay webhook signature verification implementation reviewed
+- Payment reconciliation implementation reviewed
+- Refund idempotency and failure handling implementation reviewed
+- Database persistence and trust-layer data flow verified
+- Prisma schema verified successfully
+- Prisma migration status verified successfully
+- PostgreSQL database schema confirmed up to date
+- 15 Prisma migrations confirmed successfully applied
+- Server startup verified successfully
+- Redis connection verified successfully
+- Socket.io Redis publisher/subscriber connection verified
+- Multi-worker backend startup verified
+- Git working tree verified clean
+- Git branch confirmed synchronized with remote repository
+- End-to-end trust-layer workflow prepared for live demonstration
+- Real-data offer signing and verification workflow prepared for submission
+- Trust-layer failure and edge-handling paths reviewed
+- Environment and persistence readiness verified
+- Task 15 implementation prepared for final submission
+
+**Task 15 Status: ✅ COMPLETED**
 
 ---
 
@@ -1767,9 +1842,86 @@ Determine Eligibility
 
 ---
 
+## Phase 2 · Day 15
+
+### Task 15: Trust Layer Integration & Dry Run (Backend Engineer)
+
+**Status: ✅ COMPLETED**
+
+### Completed
+
+- Trust layer integration workflow reviewed and stabilized
+- End-to-end application → offer workflow verified using real persisted data
+- Application workflow verified successfully
+- Application → `APPLIED` status verified
+- Application → `SHORTLISTED` status verified
+- Shortlisting workflow integrated with centralized status tracking
+- Application → `INTERVIEW_SCHEDULED` status verified
+- Interview scheduling workflow integrated with centralized status tracking
+- Interview data persisted successfully in PostgreSQL
+- Interview-to-application relationship verified
+- Interview-to-job relationship verified
+- Interview-to-student relationship verified
+- Application → `OFFERED` status verified
+- Offer generation workflow integrated with centralized status tracking
+- Offer generation restricted to candidates with scheduled interviews
+- Offer data persisted successfully in PostgreSQL
+- Offer-to-application relationship verified
+- Offer-to-student relationship verified
+- Offer-to-job relationship verified
+- Offer compensation and currency persistence verified
+- Offer joining date persistence verified
+- Mock e-Sign provider integration verified successfully
+- Offer e-Sign request workflow verified successfully
+- e-Sign request ID generation verified
+- e-Sign provider tracking verified
+- e-Sign status tracking verified
+- Offer document URL persistence verified
+- Student offer signing workflow verified successfully
+- Signed offer status verified as `SIGNED`
+- Signed e-Sign status verified as `SIGNED`
+- Signed timestamp persistence verified
+- SHA-256 signed offer hash generation verified
+- Signed offer hash persistence verified successfully
+- Deterministic signed offer hash generation implemented
+- Offer hash verification workflow verified
+- Stored offer hash compared with independently calculated hash
+- Stored and calculated hashes matched successfully
+- Offer authenticity verification successfully returned `valid: true`
+- Cryptographic offer integrity verification demonstrated
+- Existing application status transition validation reviewed
+- Invalid application status handling previously verified
+- Invalid application status transition handling previously verified
+- Duplicate status transition prevention previously verified
+- Payment idempotency implementation reviewed
+- Existing payment idempotency behavior observed through the API
+- Payment failure state handling reviewed
+- Razorpay payment workflow and failure-handling implementation reviewed
+- Razorpay webhook signature verification implementation reviewed
+- Payment reconciliation implementation reviewed
+- Refund idempotency and failure-handling implementation reviewed
+- Trust-layer persistence verified using PostgreSQL
+- Prisma schema verified successfully
+- Prisma migration status verified successfully
+- PostgreSQL database confirmed to be synchronized
+- All 15 Prisma migrations confirmed successfully applied
+- Backend server startup verified successfully
+- Redis connection verified successfully
+- Socket.io Redis publisher/subscriber connection verified successfully
+- Multi-worker backend startup verified successfully
+- Git working tree verified clean
+- Git branch confirmed synchronized with remote repository
+- End-to-end trust-layer workflow prepared for live demonstration
+- Real-data signed offer verification workflow prepared for submission
+- Trust-layer failure and edge-handling paths reviewed
+- Environment and persistence readiness verified
+- Task 15 trust-layer dry run completed successfully
+
+---
+
 # 🔮 Upcoming Technologies / Phase 2 Roadmap
 
-The upcoming Phase 2 tasks will progressively extend the marketplace backend, company portal, offer and e-signature workflows, payment infrastructure, transaction workflows, and financial operations.
+The upcoming Phase 2 tasks will progressively extend the marketplace backend, trust layer, integrations, financial workflows, and production-oriented backend architecture.
 
 Future areas will include:
 
@@ -1781,27 +1933,35 @@ Future areas will include:
 - Search and filtering
 - Matching and recommendation logic
 - Candidate and assessment workflows
-- Offer generation and offer lifecycle management
-- E-signature provider integration
+- Advanced application lifecycle management
+- Application status tracking enhancements
+- Offer lifecycle management
+- E-signature provider integration enhancements
 - Offer document generation and management
-- Candidate offer acceptance and rejection workflows
+- Signed offer verification and integrity protection
+- Trust-layer stabilization
 - Payment and transaction workflows
 - Razorpay payment verification and transaction management
+- Payment idempotency and duplicate request protection
 - Pay-per-application workflows
 - Application and payment state management
+- Payment webhook processing and signature verification
+- Payment failure and retry handling
 - Receipt generation and retrieval
 - Refund processing and refund lifecycle management
 - Payment reconciliation and gateway transaction matching
 - Financial transaction tracking
-- Payment failure handling and resilience
 - Deterministic gateway error handling
+- End-to-end transaction and trust-layer verification
+- Failure and edge-case handling
 - Additional security and authorization
+- API reliability and resilience improvements
 - Performance and scalability improvements
 - Production-oriented backend architecture
 - Further marketplace integration and stabilization
 
 > These technologies and capabilities will be introduced progressively as the corresponding Phase 2 tasks are implemented.
----
+--- 
 
 # ▶️ How to Run the Project
 
