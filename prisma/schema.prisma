@@ -21,6 +21,7 @@ model User {
   payments     Payment[]
   offers       Offer[]
   interviews   Interview[]
+  consents     Consent[]
 }
 
 model Product {
@@ -305,4 +306,23 @@ model ApplicationStatusHistory {
   @@index([applicationId])
   @@index([status])
   @@index([createdAt])
+}
+
+model Consent {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  purpose     String
+  granted     Boolean   @default(false)
+  version     String
+  grantedAt   DateTime?
+  withdrawnAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, purpose])
+  @@index([userId])
+  @@index([purpose])
+  @@index([granted])
 }

@@ -77,6 +77,8 @@ const applicationRoutes = require("./routes/applicationRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const interviewRoutes = require("./routes/interviewRoutes");
 const applicationStatusRoutes = require("./routes/applicationStatusRoutes");
+const consentRoutes = require("./routes/consentRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 // Public routes
 app.use("/", healthRoutes);
@@ -87,6 +89,7 @@ app.use("/", offerRoutes);
 app.use("/", discoveryRoutes);
 app.use("/", interviewRoutes);
 app.use(applicationStatusRoutes);
+app.use("/", userRoutes);
 
 // Swagger API documentation
 app.use(
@@ -105,6 +108,9 @@ app.use("/", jobRoutes);
 app.use("/", applicationRoutes);
 app.use("/", cacheMetricsRoutes);
 
+// Consent routes
+app.use("/", consentRoutes);
+
 // Payment routes
 // paymentRoutes already defines:
 // /payments/orders
@@ -120,8 +126,6 @@ app.use("/", cacheMetricsRoutes);
 // /api/payments/:paymentId/refund
 // /api/payments/:paymentId/reconcile
 app.use("/api", paymentRoutes);
-
-
 
 // Global production-safe error handler
 app.use((err, req, res, next) => {
@@ -145,4 +149,3 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
-
