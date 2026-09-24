@@ -2,26 +2,19 @@ const prisma = require("../config/prismaClient");
 
 // Get all users
 async function getAllUsers(page = 1, limit = 5) {
-
     return await prisma.user.findMany({
-
         skip: (page - 1) * limit,
-
         take: limit,
-
         orderBy: {
             id: "asc",
         },
-
         select: {
             id: true,
             name: true,
             email: true,
             role: true,
         },
-
     });
-
 }
 
 // Get user by ID
@@ -80,10 +73,36 @@ async function deleteUser(id) {
     }
 }
 
+// Get logged-in user's data
+async function getUserWithData(id) {
+    try {
+        return await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+                applications: true,
+                payments: true,
+                offers: true,
+                interviews: true,
+                consents: true,
+                orders: true,
+            },
+        });
+    } catch (error) {
+        throw new Error(`Database error while fetching user data: ${error.message}`);
+    }
+}
+
 // Transaction Example
 async function createUserAndProduct(userData, productData) {
     return await prisma.$transaction(async (tx) => {
-
         const user = await tx.user.create({
             data: userData,
         });
@@ -143,6 +162,7 @@ module.exports = {
     createUser,
     updateUser,
     deleteUser,
+    getUserWithData,
     createUserAndProduct,
 
     getUsersWithOrders,

@@ -692,6 +692,36 @@ The implementation and verification includes:
 
 **Task 15 Status: ✅ COMPLETED**
 
+## Task 22 — Data-Subject Rights & Resilience
+
+### Implemented
+
+- Added authenticated data-access endpoint:
+  - `GET /users/me/data`
+- Added self-service account deletion:
+  - `DELETE /users/me`
+- Added user data retrieval through the existing Prisma relations.
+- Verified cascade deletion of user-owned consent data.
+- Added Prisma schema drift monitoring script:
+  - `scripts/check-schema-drift.js`
+- Added npm command:
+  - `npm run drift-check`
+
+### Verification
+
+- Data access with JWT: Passed
+- Unauthenticated data access: Rejected with `Access token is missing.`
+- User erasure: Passed
+- Cascade deletion of associated consent: Passed
+- Prisma schema validation: Passed
+- Prisma migration status: Up to date
+- Drift check: Passed
+- Existing automated tests: 33/33 passed
+
+### Task 22 Status
+
+Completed — Data access, data erasure, authentication protection, cascade deletion, and schema drift monitoring were implemented and verified with real persisted data.
+
 ---
 
 
