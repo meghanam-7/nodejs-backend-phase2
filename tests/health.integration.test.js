@@ -10,7 +10,7 @@ describe("Health API", () => {
 
         expect(response.body).toEqual({
             status: "OK",
-            message: "Server is running",
+            message: "Server and database are healthy",
         });
     });
 });
